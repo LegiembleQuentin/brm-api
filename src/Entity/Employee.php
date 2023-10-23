@@ -87,6 +87,10 @@ class Employee
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: TimeSlot::class)]
     private Collection $timeSlots;
 
+    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Restaurant $restaurant = null;
+
     public function __construct()
     {
         $this->feedback = new ArrayCollection();
@@ -463,6 +467,18 @@ class Employee
                 $timeSlot->setEmployee(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRestaurant(): ?Restaurant
+    {
+        return $this->restaurant;
+    }
+
+    public function setRestaurant(?Restaurant $restaurant): static
+    {
+        $this->restaurant = $restaurant;
 
         return $this;
     }
