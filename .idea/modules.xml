@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/brmAPI.iml" filepath="$PROJECT_DIR$/.idea/brmAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/brm-api.iml" filepath="$PROJECT_DIR$/.idea/brm-api.iml" />
     </modules>
   </component>
 </project>
