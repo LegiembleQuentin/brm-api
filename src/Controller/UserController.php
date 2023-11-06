@@ -33,7 +33,7 @@ class UserController extends AbstractController
             $email = $decoded->email;
             $password = $decoded->password;
             $username = $decoded->username;
-            $roles = $decoded->roles;
+            $roles = ['ROLE_ADMIN'];
             $enabled = $decoded->enabled;
             //$datetime = 'now';
             $created_at = date_create_immutable();
