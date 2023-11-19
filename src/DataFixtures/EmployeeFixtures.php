@@ -10,10 +10,13 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class EmployeeFixtures extends Fixture implements DependentFixtureInterface
 {
+    public const EMPLOYEE_REFERENCE = 'employee';
+
     public function load(ObjectManager $manager): void
     {
-//        $connection = $manager->getConnection();
-//        $connection->setNestTransactionsWithSavepoints(true);
+        //        $connection = $manager->getConnection();
+        //        $connection->setNestTransactionsWithSavepoints(true);
+
 
         $faker = Factory::create('fr_FR');
 
@@ -42,9 +45,9 @@ class EmployeeFixtures extends Fixture implements DependentFixtureInterface
             $restaurantReference = 'restaurant-' . rand(0, 14);
             $restaurant = $this->getReference($restaurantReference);
             $employee->setRestaurant($restaurant);
-
-
             $manager->persist($employee);
+
+            $this->addReference('employee-' . $i, $employee);
         }
 
         $manager->flush();

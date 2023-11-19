@@ -88,7 +88,7 @@ class Employee
     #[ORM\ManyToOne(inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Restaurant $restaurant = null;
-
+  
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
