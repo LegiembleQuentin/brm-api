@@ -19,8 +19,9 @@ class EmployeeFixtures extends Fixture implements DependentFixtureInterface
 
         for ($i = 0; $i < 100; $i++) {
             $employee = new Employee();
-            $employee->setRole($faker->randomElement(['EMPLOYEE', 'MANAGER', '']));
-            $employee->setSexe($faker->randomElement(['male', 'female']));
+            $employee->setRole($faker->randomElement(['EMPLOYEE', 'MANAGER', 'DIRECTOR']));
+            $employee->setEmail($faker->email());
+            $employee->setSexe($faker->randomElement(['M', 'F']));
             $employee->setName($faker->lastName());
             $employee->setFirstname($faker->firstName());
             $employee->setBirthdate($faker->dateTimeThisCentury());

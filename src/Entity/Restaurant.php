@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RestaurantRepository::class)]
-#[ApiResource]
 class Restaurant
 {
     #[ORM\Id]
@@ -63,14 +62,10 @@ class Restaurant
     #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: Stock::class)]
     private Collection $stocks;
 
-    #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: Employee::class)]
-    private Collection $employees;
-
     public function __construct()
     {
         $this->userRestaurants = new ArrayCollection();
         $this->stocks = new ArrayCollection();
-        $this->employees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -288,36 +283,6 @@ class Restaurant
             // set the owning side to null (unless already changed)
             if ($stock->getRestaurant() === $this) {
                 $stock->setRestaurant(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Employee>
-     */
-    public function getEmployees(): Collection
-    {
-        return $this->employees;
-    }
-
-    public function addEmployee(Employee $employee): static
-    {
-        if (!$this->employees->contains($employee)) {
-            $this->employees->add($employee);
-            $employee->setRestaurant($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEmployee(Employee $employee): static
-    {
-        if ($this->employees->removeElement($employee)) {
-            // set the owning side to null (unless already changed)
-            if ($employee->getRestaurant() === $this) {
-                $employee->setRestaurant(null);
             }
         }
 

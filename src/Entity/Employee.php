@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EmployeeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,7 +9,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
-#[ApiResource]
 class Employee
 {
     #[ORM\Id]
@@ -63,7 +61,7 @@ class Employee
     #[ORM\Column]
     private ?bool $enabled = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
@@ -90,6 +88,9 @@ class Employee
     #[ORM\ManyToOne(inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Restaurant $restaurant = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
 
     public function __construct()
     {
@@ -479,6 +480,18 @@ class Employee
     public function setRestaurant(?Restaurant $restaurant): static
     {
         $this->restaurant = $restaurant;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
 
         return $this;
     }
