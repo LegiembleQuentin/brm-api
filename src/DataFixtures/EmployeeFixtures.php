@@ -17,12 +17,14 @@ class EmployeeFixtures extends Fixture implements DependentFixtureInterface
         //        $connection = $manager->getConnection();
         //        $connection->setNestTransactionsWithSavepoints(true);
 
+
         $faker = Factory::create('fr_FR');
 
         for ($i = 0; $i < 100; $i++) {
             $employee = new Employee();
-            $employee->setRole($faker->randomElement(['EMPLOYEE', 'MANAGER', '']));
-            $employee->setSexe($faker->randomElement(['male', 'female']));
+            $employee->setRole($faker->randomElement(['EMPLOYEE', 'MANAGER', 'DIRECTOR']));
+            $employee->setEmail($faker->email());
+            $employee->setSexe($faker->randomElement(['M', 'F']));
             $employee->setName($faker->lastName());
             $employee->setFirstname($faker->firstName());
             $employee->setBirthdate($faker->dateTimeThisCentury());
@@ -43,7 +45,6 @@ class EmployeeFixtures extends Fixture implements DependentFixtureInterface
             $restaurantReference = 'restaurant-' . rand(0, 14);
             $restaurant = $this->getReference($restaurantReference);
             $employee->setRestaurant($restaurant);
-
             $manager->persist($employee);
 
             $this->addReference('employee-' . $i, $employee);

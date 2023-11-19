@@ -34,9 +34,9 @@ class RestaurantFixtures extends Fixture
 
             $restaurant->setCreatedAt(new \DateTimeImmutable());
             $restaurant->setEnabled($faker->boolean(90));
-
+          
             $manager->persist($restaurant);
-
+          
             $this->addReference('restaurant-' . $i, $restaurant);
         }
 
