@@ -8,7 +8,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
-class CategoryFixtures extends Fixture implements DependentFixtureInterface
+class CategoryFixtures extends Fixture
 {
     public const CATEGORY_REFERENCE = 'category';
 
@@ -19,16 +19,12 @@ class CategoryFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 0; $i < 3; $i++) {
             $category = new Category();
             $category->setName($faker->unique()->randomElement(['Boissons', 'Burgers', 'Frites']));
-            $manager->persist($category);
+
             $this->addReference('category-' . $i, $category);
+
+            $manager->persist($category);
         }
 
         $manager->flush();
-    }
-    public function getDependencies(): array
-    {
-        return [
-            ProductFixtures::class,
-        ];
     }
 }
