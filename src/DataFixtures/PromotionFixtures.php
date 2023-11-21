@@ -11,7 +11,7 @@ use Faker\Factory;
 class PromotionFixtures extends Fixture implements DependentFixtureInterface
 {
     public const PROMOTION_REFERENCE = 'promotion';
-
+    private static $usedAdReferences = [];
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
@@ -20,12 +20,12 @@ class PromotionFixtures extends Fixture implements DependentFixtureInterface
 
             $promotion = new Promotion();
 
-            $promotion->setTitle($faker->unique()->sentence());
+            $promotion->setTitle($faker->sentence());
             $promotion->setReduction($faker->randomFloat(2, 5, 50));
             $promotion->setCreatedAt(new \DateTimeImmutable());
             $promotion->setEnabled($faker->boolean());
 
-            $adReference = 'ad-' . rand(0, 14);
+            $adReference = $this->generateUniqueAdReference();
             $ad = $this->getReference($adReference);
             $promotion->setAd($ad);
 
@@ -42,5 +42,17 @@ class PromotionFixtures extends Fixture implements DependentFixtureInterface
         return [
             AdFixtures::class,
         ];
+    }
+
+    private function generateUniqueAdReference()
+    {
+        do {
+            $adReference = 'ad-' . rand(0, 14);
+        } while (in_array($adReference, self::$usedAdReferences));
+
+        // Marquer l'ad référence comme utilisée
+        self::$usedAdReferences[] = $adReference;
+
+        return $adReference;
     }
 }

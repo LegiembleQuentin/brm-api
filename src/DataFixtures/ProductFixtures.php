@@ -20,7 +20,6 @@ class ProductFixtures extends Fixture
 
         for ($i = 0; $i < 13; $i++) {
             $product = new Product();
-            $category = new Category();
 
             $product->setName($faker->unique()->randomElement(['Americain', 'Epicurien', 'Montagnar', 'Berger', 'Costaud', 'Fétard', 'Frite', 'Frite Cheddar', 'Frite Cheddar Bacon', 'Coca Cola', 'Ice Tea', 'Fanta', 'Oasis']));
             $product->setDescription($faker->sentence());
