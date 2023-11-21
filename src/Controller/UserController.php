@@ -5,18 +5,33 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Security;
+
+
 use Symfony\Component\Serializer\SerializerInterface;
+
+
+
 
 
 #[Route('/api', name: 'api_')]
 class UserController extends AbstractController
 {
+
+   
     #[Route('/adduser', name: 'app_adduser', methods: "POST")]
     public function addUser(Request $request,SerializerInterface $serializer): JsonResponse
     {
@@ -33,7 +48,7 @@ class UserController extends AbstractController
             $email = $decoded->email;
             $password = $decoded->password;
             $username = $decoded->username;
-            $roles = ['ROLE_ADMIN'];
+            $roles = $decoded->roles;
             $enabled = $decoded->enabled;
             //$datetime = 'now';
             $created_at = date_create_immutable();
@@ -58,4 +73,6 @@ class UserController extends AbstractController
         return $this->json(["message" => "success"]);
 
     }
+
+
 }
