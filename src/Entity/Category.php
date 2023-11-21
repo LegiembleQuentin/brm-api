@@ -61,25 +61,6 @@ class Category
         return $this->products;
     }
 
-    public function addProduct(Product $product): static
-    {
-        if (!$this->products->contains($product)) {
-            $this->products->add($product);
-            $product->addCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProduct(Product $product): static
-    {
-        if ($this->products->removeElement($product)) {
-            $product->removeCategory($this);
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, PromotionCampaign>
      */

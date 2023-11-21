@@ -28,7 +28,10 @@ class EmployeeController extends AbstractController
     {
         //gerer les droits
         $employees = $this->employeeService->getEmployees();
-        $employeesJson = $this->serializer->serialize($employees, 'json');
+        $employee = [
+            'bonjour'
+        ];
+        $employeesJson = $this->serializer->serialize($employee, 'json');
 
         return new Response($employeesJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
@@ -65,5 +68,4 @@ class EmployeeController extends AbstractController
 
         return new Response($employeeJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
-
 }
