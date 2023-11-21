@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231121134351 extends AbstractMigration
+final class Version20231121154910 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -33,7 +33,7 @@ final class Version20231121134351 extends AbstractMigration
         $this->addSql('CREATE TABLE `order` (id INT AUTO_INCREMENT NOT NULL, customer_id INT DEFAULT NULL, date DATETIME NOT NULL, price NUMERIC(10, 2) NOT NULL, status VARCHAR(255) NOT NULL, INDEX IDX_F52993989395C3F3 (customer_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE order_product (id INT AUTO_INCREMENT NOT NULL, associated_order_id INT NOT NULL, product_id INT NOT NULL, promotion_campaign_id INT DEFAULT NULL, quantity INT NOT NULL, date DATETIME NOT NULL, INDEX IDX_2530ADE6FC35A14E (associated_order_id), INDEX IDX_2530ADE64584665A (product_id), INDEX IDX_2530ADE627C73EAE (promotion_campaign_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE product (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, price INT DEFAULT NULL, img_url LONGTEXT DEFAULT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', modified_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE product_category (id INT AUTO_INCREMENT NOT NULL, product_id INT DEFAULT NULL, category_id INT NOT NULL, INDEX IDX_CDFC73564584665A (product_id), INDEX IDX_CDFC735612469DE2 (category_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE product_category (product_id INT NOT NULL, category_id INT NOT NULL, INDEX IDX_CDFC73564584665A (product_id), INDEX IDX_CDFC735612469DE2 (category_id), PRIMARY KEY(product_id, category_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE product_stock (id INT AUTO_INCREMENT NOT NULL, stock_id INT NOT NULL, product_id INT NOT NULL, stock_quantity NUMERIC(7, 2) NOT NULL, unit VARCHAR(45) NOT NULL, INDEX IDX_EA6A2D3CDCD6110 (stock_id), INDEX IDX_EA6A2D3C4584665A (product_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE promotion (id INT AUTO_INCREMENT NOT NULL, ad_id INT DEFAULT NULL, reduction INT NOT NULL, enabled TINYINT(1) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', modified_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', title VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_C11D7DD14F34D596 (ad_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE promotion_campaign (id INT AUTO_INCREMENT NOT NULL, promotion_id INT NOT NULL, product_id INT DEFAULT NULL, category_id INT DEFAULT NULL, start_date DATETIME NOT NULL, end_date DATETIME NOT NULL, enabled TINYINT(1) NOT NULL, description LONGTEXT DEFAULT NULL, INDEX IDX_D941B699139DF194 (promotion_id), INDEX IDX_D941B6994584665A (product_id), INDEX IDX_D941B69912469DE2 (category_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -61,8 +61,8 @@ final class Version20231121134351 extends AbstractMigration
         $this->addSql('ALTER TABLE order_product ADD CONSTRAINT FK_2530ADE6FC35A14E FOREIGN KEY (associated_order_id) REFERENCES `order` (id)');
         $this->addSql('ALTER TABLE order_product ADD CONSTRAINT FK_2530ADE64584665A FOREIGN KEY (product_id) REFERENCES product (id)');
         $this->addSql('ALTER TABLE order_product ADD CONSTRAINT FK_2530ADE627C73EAE FOREIGN KEY (promotion_campaign_id) REFERENCES promotion_campaign (id)');
-        $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC73564584665A FOREIGN KEY (product_id) REFERENCES product (id)');
-        $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC735612469DE2 FOREIGN KEY (category_id) REFERENCES category (id)');
+        $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC73564584665A FOREIGN KEY (product_id) REFERENCES product (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC735612469DE2 FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE product_stock ADD CONSTRAINT FK_EA6A2D3CDCD6110 FOREIGN KEY (stock_id) REFERENCES stock (id)');
         $this->addSql('ALTER TABLE product_stock ADD CONSTRAINT FK_EA6A2D3C4584665A FOREIGN KEY (product_id) REFERENCES product (id)');
         $this->addSql('ALTER TABLE promotion ADD CONSTRAINT FK_C11D7DD14F34D596 FOREIGN KEY (ad_id) REFERENCES ad (id)');
