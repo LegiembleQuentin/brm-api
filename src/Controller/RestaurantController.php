@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\RestaurantService;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +25,7 @@ class RestaurantController extends AbstractController
     public function index(): Response
     {
         $restaurants = $this->restaurantService->getRestaurant();
-        $restaurantsJson = $this->serializer->serialize($restaurants, 'json');
+        $restaurantsJson = $this->serializer->serialize($restaurants, 'json', SerializationContext::create()->setGroups(['restaurant', 'default']));
 
         return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }

@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Employee;
+use App\Filter\EmployeeFilter;
 use App\Service\EmployeeService;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,30 +21,63 @@ class EmployeeController extends AbstractController
 
     public function __construct(SerializerInterface $serializer, EmployeeService $employeeService)
     {
-        $this->serializer = $serializer;
+        $this->serializer = SerializerBuilder::create()->build();;
         $this->employeeService = $employeeService;
     }
 
+//    #[Route('/employees', methods: ['GET'])]
+//    public function getEmployees(): Response
+//    {
+//        //gerer les droits
+//        $employees = $this->employeeService->getEmployees();
+//        $employeesJson = $this->serializer->serialize($employees, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
+//
+//        return new Response($employeesJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+//    }
+
     #[Route('/employees', methods: ['GET'])]
-    public function getEmployees(): Response
+    public function getEmployees(Request $request): Response
     {
-        //gerer les droits
-        $employees = $this->employeeService->getEmployees();
-        $employeesJson = $this->serializer->serialize($employees, 'json');
+        //gerer les droits/roles?
+
+        $filters = new EmployeeFilter();
+        $search = $request->query->get('search');
+        if(isset($search) && $search != 'undefined' && $search != null && $search != 'null') {
+            $filters->setSearch($search);
+        }
+        $contractType = $request->query->get(('contractType'));
+        if(isset($contractType) && $contractType != 'undefined' && $contractType != null && $contractType != 'null'){
+            $filters->setContractType($contractType);
+        }
+        $restaurant = $request->query->get('restaurant');
+        if(isset($restaurant) && $restaurant != 'undefined' && $restaurant != null && $restaurant != 'null'){
+            $filters->setRestaurant($restaurant);
+        }
+        $role = $request->query->get('role');
+        if(isset($role) && $role != 'undefined' && $role != null && $role != 'null'){
+            $filters->setRole($role);
+        }
+
+        $employees = $this->employeeService->findByFilter($filters);
+        $employeesJson = $this->serializer->serialize($employees, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
 
         return new Response($employeesJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
     #[Route('/employee', methods: ['POST'])]
-    public function addEmployee(Request $request): Response
+    public function addEmployee(Request $request, SerializerInterface $serializer): Response
     {
         $content = $request->getContent();
-        $employee = $this->serializer->deserialize($content, Employee::class, 'json');
 
-        dump($employee);
+        print_r($content);
+
+        $employee = $serializer->deserialize($content, Employee::class, 'json');
+
+        print_r($employee);
 
         if ($employee->getId() !== null) {
             //retourner vers l'update
+
         }
 
         $result = $this->employeeService->save($employee);
@@ -61,7 +96,7 @@ class EmployeeController extends AbstractController
             return $this->json(['message' => 'Employee not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $employeeJson = $this->serializer->serialize($employee, 'json');
+        $employeeJson = $this->serializer->serialize($employee, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
 
         return new Response($employeeJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }

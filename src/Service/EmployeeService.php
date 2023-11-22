@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Employee;
+use App\Filter\EmployeeFilter;
 use Doctrine\ORM\EntityManagerInterface;
 
 class EmployeeService
@@ -21,6 +22,15 @@ class EmployeeService
     {
         $employeeRepo = $this->em->getRepository(Employee::class);
         return $employeeRepo->findAll();
+    }
+
+    /**
+     * @return Employee[]
+     */
+    public function findByFilter(EmployeeFilter $filters) : array
+    {
+        $employeeRepo = $this->em->getRepository(Employee::class);
+        return $employeeRepo->findByFilter($filters);
     }
 
     public function getEmployeeById(int $id): ?Employee

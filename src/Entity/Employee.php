@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
@@ -14,82 +16,108 @@ class Employee
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(["default", "employee"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(["default", "employee"])]
     private ?string $role = null;
 
     #[ORM\Column(length: 20)]
+    #[Serializer\Groups(["default", "employee"])]
     private ?string $sexe = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(["default", "employee"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(["default", "employee"])]
     private ?string $firstname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Serializer\Groups(["employee"])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Serializer\Groups(["employee"])]
     private ?\DateTimeInterface $hire_date = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(["employee"])]
     private ?string $phone = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $adress = null;
+    #[Serializer\Groups(["employee"])]
+    private ?string $address = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Serializer\Groups(["employee"])]
     private ?string $postal_code = null;
 
     #[ORM\Column(length: 45, nullable: true)]
+    #[Serializer\Groups(["employee"])]
     private ?string $social_security_number = null;
 
     #[ORM\Column(length: 45)]
+    #[Serializer\Groups(["employee"])]
     private ?string $contract_type = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(["employee"])]
     private ?\DateTimeInterface $contract_end_date = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(["employee"])]
     private ?bool $disability = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Serializer\Groups(["employee"])]
     private ?string $disability_desc = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(["employee"])]
     private ?bool $enabled = null;
 
     #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(["employee"])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(["employee"])]
     private ?\DateTimeImmutable $modified_at = null;
 
     #[ORM\OneToOne(inversedBy: 'employee', cascade: ['persist', 'remove'])]
+    #[Serializer\Groups(["employee"])]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Feedback::class)]
+    #[Serializer\Groups(["employee"])]
     private Collection $feedback;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Feedback::class)]
+    #[Serializer\Groups(["employee"])]
     private Collection $concernedFeedback;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Warning::class)]
+    #[Serializer\Groups(["employee"])]
     private Collection $warnings;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Absences::class)]
+    #[Serializer\Groups(["employee"])]
     private Collection $absences;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: TimeSlot::class)]
+    #[Serializer\Groups(["employee"])]
     private Collection $timeSlots;
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Serializer\Groups(["employee"])]
     private ?Restaurant $restaurant = null;
   
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(["default", "employee"])]
     private ?string $email = null;
 
     public function __construct()
@@ -190,14 +218,14 @@ class Employee
         return $this;
     }
 
-    public function getAdress(): ?string
+    public function getAddress(): ?string
     {
-        return $this->adress;
+        return $this->address;
     }
 
-    public function setAdress(?string $adress): static
+    public function setAddress(?string $address): static
     {
-        $this->adress = $adress;
+        $this->address = $address;
 
         return $this;
     }
