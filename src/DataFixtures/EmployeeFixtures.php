@@ -30,7 +30,7 @@ class EmployeeFixtures extends Fixture implements DependentFixtureInterface
             $employee->setBirthdate($faker->dateTimeThisCentury());
             $employee->setHireDate($faker->dateTimeThisDecade());
             $employee->setPhone($faker->phoneNumber());
-            $employee->setAdress($faker->address());
+            $employee->setAddress($faker->address());
             $employee->setPostalCode($faker->postcode());
             $employee->setSocialSecurityNumber($faker->numerify('###-##-####'));
             $employee->setContractType($faker->randomElement(['FULL_TIME', 'PART_TIME', 'TEMPORARY', 'PROBATION']));
