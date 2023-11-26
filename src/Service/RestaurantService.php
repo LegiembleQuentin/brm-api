@@ -22,4 +22,10 @@ class RestaurantService
         $restaurantRepo = $this->entityManager->getRepository(Restaurant::class);
         return $restaurantRepo->findAll();
     }
+
+    public function getRestaurantById(int $id): ?Restaurant
+    {
+        $restaurantRepo = $this->entityManager->getRepository(Restaurant::class);
+        return $restaurantRepo->find($id);
+    }
 }

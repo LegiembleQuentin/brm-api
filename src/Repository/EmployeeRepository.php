@@ -24,28 +24,43 @@ class EmployeeRepository extends ServiceEntityRepository
 
     public function findByFilter(EmployeeFilter $filters) : array
     {
-        // Créez un objet QueryBuilder
         $qb = $this->createQueryBuilder('e');
 
-        // Appliquez les filtres en fonction des propriétés de l'objet $filters
-        if ($filters->getSearch()) {
-            $qb->andWhere('e.name LIKE :search OR e.email LIKE :search')
-                ->setParameter('search', '%' . $filters->getSearch() . '%');
+        if ($filters->getSearch() && $filters->getSearch() !== 'undefined') {
+            $searchTerm = '%' . str_replace(' ', '%', $filters->getSearch()) . '%';
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('e.name', ':search'),
+                    $qb->expr()->like('e.firstname', ':search'),
+                    $qb->expr()->like('e.email', ':search'),
+                    $qb->expr()->like(
+                        $qb->expr()->concat('e.firstname', $qb->expr()->concat($qb->expr()->literal(' '), 'e.name')),
+                        ':search'
+                    ),
+                    $qb->expr()->like(
+                        $qb->expr()->concat('e.name', $qb->expr()->concat($qb->expr()->literal(' '), 'e.firstname')),
+                        ':search'
+                    )
+                )
+            )->setParameter('search', $searchTerm);
         }
-        if ($filters->getContractType()) {
+
+        if ($filters->getContractType() && $filters->getContractType() !== 'undefined') {
             $qb->andWhere('e.contract_type = :contractType')
                 ->setParameter('contractType', $filters->getContractType());
         }
-        if ($filters->getRestaurant()) {
+        if ($filters->getRestaurant() && $filters->getRestaurant() != 0) {
             $qb->andWhere('e.restaurant = :restaurant')
                 ->setParameter('restaurant', $filters->getRestaurant());
         }
-        if ($filters->getRole()) {
+        if ($filters->getRole() && $filters->getRole() !== 'undefined') {
             $qb->andWhere('e.role = :role')
                 ->setParameter('role', $filters->getRole());
         }
-
-        // Ajoutez des filtres supplémentaires si nécessaire
+        if ($filters->isEnabled()){
+            $qb->andWhere('e.enabled = :enabled')
+                ->setParameter('enabled', 1);
+        }
 
         return $qb->getQuery()->getResult();
     }

@@ -29,13 +29,4 @@ class RestaurantController extends AbstractController
 
         return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
-//
-//    #[Route('/employees', name: 'app_employees', methods: ['GET'])]
-//    public function index(): Response
-//    {
-//        $employees = $this->employeeService->getEmployees();
-//        $jsonContent = $this->serializer->serialize($employees, 'json');
-//
-//        return new Response($jsonContent, Response::HTTP_OK, ['Content-Type' => 'application/json']);
-//    }
 }
