@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Employee;
 use App\Entity\User;
 
 use DateTimeImmutable;
@@ -64,8 +65,44 @@ class UserController extends AbstractController
             $expiry = $expiry->modify('+2 day');
             $expiryToken = $expiry->format('Y-m-d H:i:s');
             $created_at = date_create_immutable();
+            $roleEmployee = $decoded->roleEmployee;
+            $sexe = $decoded->sexe;
+            $name = $decoded->name;
+            $fname = $decoded->fname;
+            $birth = $decoded->birth;
+            $hire_date = $decoded->hire;
+            $phone = $decoded->phone;
+            $adress = $decoded->adress;
+            $postal = $decoded->postal;
+            $secuNum = $decoded->secuNum;
+            $contract = $decoded->contract;
+            $contractEnd = $decoded->contractEnd;
+            $disability = $decoded->disability;
+            $disabilityDesc = $decoded->disabilityDesc;
+            $enabledEmployee = $enabled;
+
 
             $user = new User();
+            $employee = new Employee();
+
+            $employee->setEnabled($enabledEmployee);
+            $employee->setCreatedAt($created_at);
+            $employee->setUser($user->getId());
+            $employee->setAdress($adress);
+            $employee->setBirthdate($birth);
+            $employee->setContractEndDate($contractEnd);
+            $employee->setContractType($contract);
+            $employee->setDisability($disability);
+            $employee->setDisabilityDesc($disabilityDesc);
+            $employee->setFirstname($fname);
+            $employee->setHireDate($hire_date);
+            $employee->setName($name);
+            $employee->setPhone($phone);
+            $employee->setSexe($sexe);
+            $employee->setPostalCode($postal);
+            $employee->setSocialSecurityNumber($secuNum);
+            $employee->setRole($roleEmployee);
+
             $user->setEmail($email);
             $user->setUsername($username);
             $user->setRoles($roles);
@@ -74,16 +111,13 @@ class UserController extends AbstractController
             $user->setInvitationTokenExpiry($expiry);
             $user->setCreatedAt($created_at);
             $em->persist($user);
+            $em->persist($employee);
             $em->flush();
+
+
         return $this->json(["tokenUser" => $token]);
     }
-//    #[Route('/validating', name: 'app_valid', methods: "POST" )]
-//    public function validUser(Request $request): JsonResponse
-//    {
-//
-//
-//        return $this->json([]);
-//    }
+
         //Add admin function, no token necessary.
     #[Route('/addadmin', name: 'app_addadmin', methods: "POST")]
     public function addAdmin(Request $request,SerializerInterface $serializer, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder): JsonResponse
@@ -124,11 +158,11 @@ class UserController extends AbstractController
 
         $user = $em->getRepository(User::class)->findOneBy(['invitation_token' => $token]);
 
-        if (!$user || $user->getInvitationTokenExpiry() < new \DateTimeImmutable()) {
-            return $this->json(['status' => 'invalid']);
+        if (!$user || $user->getInvitationTokenExpiry() < new \DateTime()) {
+            return $this->json(['valid' => false]);
         }
 
-        return $this->json(['status' => 'valid']);
+        return $this->json(['valid' => true]);
     }
 
 }
