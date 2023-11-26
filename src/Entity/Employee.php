@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee
@@ -20,46 +20,83 @@ class Employee
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Serializer\Groups(["default", "employee"])]
     private ?string $role = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        max: 5,
+    )]
     #[Serializer\Groups(["default", "employee"])]
     private ?string $sexe = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
     #[Serializer\Groups(["default", "employee"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
     #[Serializer\Groups(["default", "employee"])]
     private ?string $firstname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull]
     #[Serializer\Groups(["employee"])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull]
     #[Serializer\Groups(["employee"])]
     private ?\DateTimeInterface $hire_date = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\Length(
+        min: 9,
+        max: 12,
+    )]
     #[Serializer\Groups(["employee"])]
     private ?string $phone = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 1000,
+    )]
     #[Serializer\Groups(["employee"])]
     private ?string $address = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 5,
+    )]
     #[Serializer\Groups(["employee"])]
     private ?string $postal_code = null;
 
     #[ORM\Column(length: 45, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 15,
+    )]
     #[Serializer\Groups(["employee"])]
     private ?string $social_security_number = null;
 
     #[ORM\Column(length: 45)]
+    #[Assert\Length(
+        max: 40,
+    )]
     #[Serializer\Groups(["employee"])]
     private ?string $contract_type = null;
 
@@ -72,6 +109,10 @@ class Employee
     private ?bool $disability = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 5000,
+    )]
     #[Serializer\Groups(["employee"])]
     private ?string $disability_desc = null;
 
@@ -111,12 +152,13 @@ class Employee
     #[Serializer\Groups(["employee"])]
     private Collection $timeSlots;
 
-    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: false)]
     #[Serializer\Groups(["employee"])]
     private ?Restaurant $restaurant = null;
   
     #[ORM\Column(length: 255)]
+    #[Assert\Email]
     #[Serializer\Groups(["default", "employee"])]
     private ?string $email = null;
 

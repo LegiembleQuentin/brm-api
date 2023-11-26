@@ -8,6 +8,7 @@ class EmployeeFilter
     private ?string $contractType = null;
     private ?int $restaurant = null;
     private ?string $role = null;
+    private bool $enabled = false;
 
     /**
      * @return string|null
@@ -73,5 +74,19 @@ class EmployeeFilter
         $this->role = $role;
     }
 
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
 
+    /**
+     * @param bool $enabled
+     */
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
+    }
 }
