@@ -3,10 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\User;
+
+use DateTimeImmutable;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
+
+
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,14 +37,53 @@ use Symfony\Component\Serializer\SerializerInterface;
 class UserController extends AbstractController
 {
 
-   
-    #[Route('/adduser', name: 'app_adduser', methods: "POST")]
-    public function addUser(Request $request,SerializerInterface $serializer): JsonResponse
+    private  JWTTokenManagerInterface $jwtManager;
+    public function __construct(JWTTokenManagerInterface $jwtManager )
+
     {
-        $decoded = json_decode($request->getContent());
-        //$jsonData = $serializer->serialize($data, 'json');
-        return $this->json([$decoded]);
+        $this->jwtManager = $jwtManager;
     }
+   
+
+
+
+    #[Route('/adduser', name: 'app_adduser', methods: "POST")]
+    public function addUser(Request $request,EntityManagerInterface $em): JsonResponse
+    {
+            $decoded = json_decode($request->getContent());
+
+            $email = $decoded->email;
+            $username = $decoded->username;
+            $roles = $decoded->roles;
+            // enbaled = false par défaut -> passera à true quand le user aura set son password après la verif de son token
+            $enabled = 0; // = false
+            // Création du token à stocker en bdd // invitation_token
+            $token = bin2hex(random_bytes(32));
+            //Date d'expiration du token
+            $expiry = date_create_immutable('+1');
+            $expiry = $expiry->modify('+2 day');
+            $expiryToken = $expiry->format('Y-m-d H:i:s');
+            $created_at = date_create_immutable();
+
+            $user = new User();
+            $user->setEmail($email);
+            $user->setUsername($username);
+            $user->setRoles($roles);
+            $user->setEnabled($enabled);
+            $user->setInvitationToken($token);
+            $user->setInvitationTokenExpiry($expiry);
+            $user->setCreatedAt($created_at);
+            $em->persist($user);
+            $em->flush();
+        return $this->json(["tokenUser" => $token]);
+    }
+//    #[Route('/validating', name: 'app_valid', methods: "POST" )]
+//    public function validUser(Request $request): JsonResponse
+//    {
+//
+//
+//        return $this->json([]);
+//    }
         //Add admin function, no token necessary.
     #[Route('/addadmin', name: 'app_addadmin', methods: "POST")]
     public function addAdmin(Request $request,SerializerInterface $serializer, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder): JsonResponse
@@ -68,11 +113,22 @@ class UserController extends AbstractController
 
 
         } else {
-            return $this->json(["message" => "Error, empty body data"]);
+            return $this->json(['' => 'Error, empty body data']);
         }
-        return $this->json(["message" => "success"]);
+        return $this->json(['' => 'registered & enabled']);
 
     }
+    #[Route('/verify-token', name: 'verify_token', methods: "POST")]
+    public function verifyToken(Request $request, EntityManagerInterface $em): JsonResponse {
+        $token = json_decode($request->getContent())->token;
 
+        $user = $em->getRepository(User::class)->findOneBy(['invitation_token' => $token]);
+
+        if (!$user || $user->getInvitationTokenExpiry() < new \DateTimeImmutable()) {
+            return $this->json(['status' => 'invalid']);
+        }
+
+        return $this->json(['status' => 'valid']);
+    }
 
 }
