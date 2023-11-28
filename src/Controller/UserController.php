@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Employee;
 use App\Entity\User;
 
+use DateTime;
 use DateTimeImmutable;
 
 use Doctrine\ORM\EntityManager;
@@ -64,19 +65,25 @@ class UserController extends AbstractController
             $expiry = date_create_immutable('+1');
             $expiry = $expiry->modify('+2 day');
             $expiryToken = $expiry->format('Y-m-d H:i:s');
+
+            //$birtday = strtotime($decoded->birth);
+
             $created_at = date_create_immutable();
             $roleEmployee = $decoded->roleEmployee;
             $sexe = $decoded->sexe;
             $name = $decoded->name;
             $fname = $decoded->fname;
-            $birth = $decoded->birth;
-            $hire_date = $decoded->hire;
+
+            $birthday = DateTime::createFromFormat('Y-m-d H:i:s', $decoded->birth);
+            //$birthday = $birthday_at;
+
+            $hire_date = DateTime::createFromFormat('Y-m-d H:i:s', $decoded->hire);
             $phone = $decoded->phone;
             $adress = $decoded->adress;
             $postal = $decoded->postal;
             $secuNum = $decoded->secuNum;
             $contract = $decoded->contract;
-            $contractEnd = $decoded->contractEnd;
+            $contractEnd = DateTime::createFromFormat('Y-m-d H:i:s', $decoded->contractEnd);
             $disability = $decoded->disability;
             $disabilityDesc = $decoded->disabilityDesc;
             $enabledEmployee = $enabled;
@@ -89,7 +96,7 @@ class UserController extends AbstractController
             $employee->setCreatedAt($created_at);
             $employee->setUser($user->getId());
             $employee->setAdress($adress);
-            $employee->setBirthdate($birth);
+            $employee->setBirthdate($birthday);
             $employee->setContractEndDate($contractEnd);
             $employee->setContractType($contract);
             $employee->setDisability($disability);
@@ -154,15 +161,27 @@ class UserController extends AbstractController
     }
     #[Route('/verify-token', name: 'verify_token', methods: "POST")]
     public function verifyToken(Request $request, EntityManagerInterface $em): JsonResponse {
-        $token = json_decode($request->getContent())->token;
+        $decode = json_decode($request->getContent());
+        $token =  $decode->token;
 
-        $user = $em->getRepository(User::class)->findOneBy(['invitation_token' => $token]);
+        $user = $em->getRepository(User::class)->findOneBy(['invitationToken' => $token]);
 
-        if (!$user || $user->getInvitationTokenExpiry() < new \DateTime()) {
-            return $this->json(['valid' => false]);
+        if(empty($user)) {
+            return $this->json(['error']);
         }
+
 
         return $this->json(['valid' => true]);
     }
+
+    #[Route('/test', name: 'test', methods: "GET")]
+    public function test(Request $request, EntityManagerInterface $em): JsonResponse {
+
+
+
+        return $this->json(['valid' => true]);
+    }
+
+
 
 }
