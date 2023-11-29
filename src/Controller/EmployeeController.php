@@ -38,12 +38,12 @@ class EmployeeController extends AbstractController
 
             $enabled = $request->query->get('enabled') === 'true';
             $filters->setEnabled($enabled);
-        }catch (\Exception $e) {
+
+            $employees = $this->employeeService->findByFilter($filters);
+            $employeesJson = $this->serializer->serialize($employees, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
+        }catch (Exception $e) {
             return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
-
-        $employees = $this->employeeService->findByFilter($filters);
-        $employeesJson = $this->serializer->serialize($employees, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
 
         return new Response($employeesJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }

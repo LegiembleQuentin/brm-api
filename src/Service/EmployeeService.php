@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Employee;
 use App\Filter\EmployeeFilter;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,7 +28,7 @@ class EmployeeService
     /**
      * @return Employee[]
      */
-    public function getEmployees() : array
+    public function findAll() : array
     {
         $employeeRepo = $this->em->getRepository(Employee::class);
         return $employeeRepo->findAll();
