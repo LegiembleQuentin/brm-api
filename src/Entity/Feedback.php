@@ -2,14 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\FeedbackRepository;
 use JMS\Serializer\Annotation as Serializer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FeedbackRepository::class)]
-#[ApiResource]
 class Feedback
 {
     #[ORM\Id]

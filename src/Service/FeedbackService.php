@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Feedback;
+use App\Filter\FeedbackFilter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -23,6 +24,17 @@ class FeedbackService {
     {
         $feedbackRepo = $this->em->getRepository(Feedback::class);
         return $feedbackRepo->findAll();
+    }
+
+    /**
+     * @return Feedback[]
+     */
+    public function findByFilter(FeedbackFilter $filters) : array
+    {
+//        print_r($filters->getDate());
+
+        $feedbackRepo = $this->em->getRepository(Feedback::class);
+        return $feedbackRepo->findFeedbacksByFilter($filters);
     }
 
 }

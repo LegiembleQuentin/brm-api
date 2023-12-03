@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Filter\FeedbackFilter;
 use App\Service\FeedbackService;
+use DateTimeImmutable;
 use Exception;
+use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
@@ -28,9 +31,21 @@ class FeedbackController extends AbstractController
     public function getFeedbacks(Request $request): Response
     {
         try {
-            $feedbacks = $this->feedbackService->getFeedbacks();
+            $jsonQuery = json_encode($request->query->all());
 
-            $feedbacksJson = $this->serializer->serialize($feedbacks, 'json', SerializationContext::create()->setGroups(['default']));
+            $filters = $this->serializer->deserialize($jsonQuery, FeedbackFilter::class, 'json', DeserializationContext::create()->setGroups(['default']));
+
+            if($request->query->get('date') != 'null' && $request->query->get('date') != 'undefined'){
+                $date = DateTimeImmutable::createFromFormat('D M d Y H:i:s e+', $request->query->get('date'));
+                $filters->setDate($date);
+            }
+            $warning = $request->query->get('warning') === 'true';
+            $filters->setWarning($warning);
+
+            $feedbacks = $this->feedbackService->findByFilter($filters);
+//            $feedbacks = $this->feedbackService->getFeedbacks();
+
+            $feedbacksJson = $this->serializer->serialize($feedbacks, 'json', SerializationContext::create()->setGroups(['default', 'feedback']));
 
         }catch (Exception $e){
             return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);

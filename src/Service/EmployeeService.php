@@ -40,7 +40,7 @@ class EmployeeService
     public function findByFilter(EmployeeFilter $filters) : array
     {
         $employeeRepo = $this->em->getRepository(Employee::class);
-        return $employeeRepo->findByFilter($filters);
+        return $employeeRepo->findEmployeesByFilter($filters);
     }
 
     public function getEmployeeById(int $id): ?Employee
