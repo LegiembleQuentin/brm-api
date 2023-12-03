@@ -54,12 +54,12 @@ class EmployeeService
         $restaurant = $this->restaurantService->getRestaurantById($employee->getRestaurant()->getId());
 
         if (!$restaurant){
-            throw new Exception("Restaurant not found.");
+            throw new Exception('Restaurant not found.');
         }
 
         $errors = $this->validator->validate($employee);
         if (count($errors) > 0) {
-            throw new Exception("Invalid employee");
+            throw new Exception('Invalid employee');
         }
 
         $employee->setRestaurant($restaurant);
@@ -75,17 +75,17 @@ class EmployeeService
     {
         $existingEmployee = $this->em->getRepository(Employee::class)->find($employee->getId());
         if (!$existingEmployee) {
-            throw new Exception("Employee not found.");
+            throw new Exception('Employee not found.');
         }
 
         $errors = $this->validator->validate($employee);
         if (count($errors) > 0) {
-            throw new Exception("Invalid employee" . $errors);
+            throw new Exception('Invalid employee' . $errors);
         }
 
         $restaurant = $this->restaurantService->getRestaurantById($employee->getRestaurant()->getId());
         if (!$restaurant){
-            throw new Exception("Restaurant not found.");
+            throw new Exception('Restaurant not found.');
         }
 
         $reflClass = new ReflectionClass($employee);

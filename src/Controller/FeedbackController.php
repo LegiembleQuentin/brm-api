@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Feedback;
 use App\Filter\FeedbackFilter;
 use App\Service\FeedbackService;
 use DateTimeImmutable;
@@ -43,7 +44,6 @@ class FeedbackController extends AbstractController
             $filters->setWarning($warning);
 
             $feedbacks = $this->feedbackService->findByFilter($filters);
-//            $feedbacks = $this->feedbackService->getFeedbacks();
 
             $feedbacksJson = $this->serializer->serialize($feedbacks, 'json', SerializationContext::create()->setGroups(['default', 'feedback']));
 
@@ -52,5 +52,26 @@ class FeedbackController extends AbstractController
         }
 
         return new Response($feedbacksJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/feedback', methods: ['POST'])]
+    public function addFeedback(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $feedbackData = $content['body'];
+            $feedbackJson = json_encode($feedbackData);
+
+            $feedback = $this->serializer->deserialize($feedbackJson, Feedback::class, 'json');
+
+            $result = $this->feedbackService->save($feedback);
+
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['feedback', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+
     }
 }
