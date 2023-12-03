@@ -78,14 +78,14 @@ class EmployeeService
             throw new Exception('Employee not found.');
         }
 
-        $errors = $this->validator->validate($employee);
-        if (count($errors) > 0) {
-            throw new Exception('Invalid employee' . $errors);
-        }
-
         $restaurant = $this->restaurantService->getRestaurantById($employee->getRestaurant()->getId());
         if (!$restaurant){
             throw new Exception('Restaurant not found.');
+        }
+
+        $errors = $this->validator->validate($employee);
+        if (count($errors) > 0) {
+            throw new Exception('Invalid employee');
         }
 
         $reflClass = new ReflectionClass($employee);

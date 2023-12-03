@@ -6,6 +6,7 @@ use App\Repository\FeedbackRepository;
 use JMS\Serializer\Annotation as Serializer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FeedbackRepository::class)]
 class Feedback
@@ -17,6 +18,11 @@ class Feedback
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 5,
+        max: 5000,
+    )]
     #[Serializer\Groups(['default', 'feedback'])]
     private ?string $content = null;
 
@@ -28,12 +34,12 @@ class Feedback
     #[Serializer\Groups(['default', 'feedback'])]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'feedback')]
+    #[ORM\ManyToOne(cascade:['persist'], inversedBy: 'feedback')]
     #[ORM\JoinColumn(nullable: false)]
     #[Serializer\Groups(['default', 'feedback'])]
     private ?Employee $author = null;
 
-    #[ORM\ManyToOne(inversedBy: 'concernedFeedback')]
+    #[ORM\ManyToOne(cascade:['persist'], inversedBy: 'concernedFeedback')]
     #[Serializer\Groups(['default', 'feedback'])]
     private ?Employee $employee = null;
 

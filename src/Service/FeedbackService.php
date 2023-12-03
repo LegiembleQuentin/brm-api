@@ -7,6 +7,8 @@ use App\Filter\FeedbackFilter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use ReflectionClass;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FeedbackService {
@@ -50,12 +52,11 @@ class FeedbackService {
         }
         $feedback->setAuthor($author);
 
-        if ($feedback->isWarning() && $feedback->getEmployee() != null){
-            $employee = $this->employeeService->getEmployeeById($feedback->getEmployee()->getId());
-            if (!$employee){
-                throw new Exception('Employee not found');
-            }
-            $feedback->setEmployee($employee);
+        $this->setEmployeeIfWarning($feedback);
+
+        $errors = $this->validator->validate($feedback);
+        if (count($errors) > 0){
+            throw new Exception('Invalid feedback');
         }
 
         $feedback->setCreatedAt(new DateTimeImmutable('now'));
@@ -64,6 +65,56 @@ class FeedbackService {
         $this->em->flush();
 
         return $feedback;
+    }
+
+    public function update(Feedback $feedback): Feedback
+    {
+        $existingFeedback = $this->em->getRepository(Feedback::class)->find($feedback);
+
+        if (!$existingFeedback) {
+            throw new Exception('Feedback not found');
+        }
+
+        $reflClass = new ReflectionClass($feedback);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($reflClass->getProperties() as $property) {
+            $name = $property->getName();
+            // Skip the ID property and collections
+            if ($name !== 'id') {
+                $value = $propertyAccessor->getValue($feedback, $name);
+                $propertyAccessor->setValue($existingFeedback, $name, $value);
+            }
+        }
+
+        $this->setEmployeeIfWarning($existingFeedback);
+        $author = $this->employeeService->getEmployeeById($feedback->getAuthor()->getId());
+        $existingFeedback->setAuthor($author);
+
+        $errors = $this->validator->validate($feedback);
+        if (count($errors) > 0){
+            throw new Exception('Invalid feedback');
+        }
+
+        $this->em->flush();
+
+        return $existingFeedback;
+    }
+
+    public function setEmployeeIfWarning($feedback) {
+        if ($feedback->isWarning() && $feedback->getEmployee() != null) {
+            $employeeId = $feedback->getEmployee()->getId();
+            $employee = $this->employeeService->getEmployeeById($employeeId);
+
+            if (!$employee) {
+                throw new Exception('Employee not found');
+            }
+
+            $feedback->setEmployee($employee);
+        }
+        //pour l'update
+        if (!$feedback->isWarning()){
+            $feedback->setEmployee(null);
+        }
     }
 
 }
