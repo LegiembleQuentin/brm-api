@@ -32,6 +32,12 @@ class FeedbackService {
         return $feedbackRepo->findAll();
     }
 
+    public function getFeedbackById(int $id): ?Feedback
+    {
+        $feedbackRepo = $this->em->getRepository(Feedback::class);
+        return $feedbackRepo->find($id);
+    }
+
     /**
      * @return Feedback[]
      */
@@ -114,6 +120,21 @@ class FeedbackService {
         //pour l'update
         if (!$feedback->isWarning()){
             $feedback->setEmployee(null);
+        }
+    }
+
+    public function delete(int $id)
+    {
+        $feedback = $this->getFeedbackById($id);
+        if (!$feedback) {
+            throw new \LogicException('Feedback not provided for deletion.');
+        }
+
+        try {
+            $this->em->remove($feedback);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 

@@ -92,4 +92,22 @@ class FeedbackController extends AbstractController
         $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['feedback', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
+
+    #[Route('/feedback/{id}', methods: ['DELETE'])]
+    public function deleteFeedback(int $id): Response
+    {
+        // GESTION DES ROLES
+        // if (!$this->isGranted('ROLE_ADMIN')) {
+        //     return $this->json(['message' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        // }
+
+        try {
+            $this->feedbackService->delete($id);
+
+            return new Response(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+
+            return $this->json(['message' => 'Error deleting feedback: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
