@@ -16,71 +16,71 @@ class Restaurant
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Serializer\Groups(["restaurant", "default"])]
+    #[Serializer\Groups(['restaurant', 'default'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(["restaurant", "default"])]
+    #[Serializer\Groups(['restaurant', 'default'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $adress = null;
 
     #[ORM\Column(length: 10)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $postal_code = null;
 
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $country = null;
 
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $operating_hours = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $rating = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?\DateTimeInterface $open_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?\DateTimeInterface $close_date = null;
 
     #[ORM\Column]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private ?bool $enabled = null;
 
     #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: UserRestaurant::class)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private Collection $userRestaurants;
 
     #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: Employee::class)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private Collection $employees;
 
     #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: Stock::class)]
-    #[Serializer\Groups(["restaurant"])]
+    #[Serializer\Groups(['restaurant'])]
     private Collection $stocks;
 
     public function __construct()

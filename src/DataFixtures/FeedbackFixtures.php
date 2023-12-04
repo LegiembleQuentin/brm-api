@@ -30,7 +30,8 @@ class FeedbackFixtures extends Fixture implements DependentFixtureInterface
 
             $feedback->setContent($faker->text(200));
             $feedback->setWarning($faker->randomElement([true, false]));
-            $feedback->setCreatedAt(new \DateTimeImmutable());
+            $randomDate = $faker->dateTimeBetween('-1 year', 'now');
+            $feedback->setCreatedAt(\DateTimeImmutable::createFromMutable($randomDate));
 
             $feedback->setEmployee($faker->randomElement([
                 $employee, null
