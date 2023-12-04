@@ -38,7 +38,7 @@ class EmployeeController extends AbstractController
 
             $enabled = $request->query->get('enabled') === 'true';
             $filters->setEnabled($enabled);
-        }catch (\Exception $e) {
+        } catch (Exception $e) {
             return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
@@ -59,14 +59,12 @@ class EmployeeController extends AbstractController
             $employee = $this->serializer->deserialize($employeeJson, Employee::class, 'json');
 
             $result = $this->employeeService->save($employee);
-
         } catch (Exception $e) {
             return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
-
     }
 
     #[Route('/employee', methods: ['PUT'])]
@@ -80,7 +78,7 @@ class EmployeeController extends AbstractController
             $employee = $this->serializer->deserialize($employeeJson, Employee::class, 'json');
 
             $result = $this->employeeService->update($employee);
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
@@ -109,21 +107,21 @@ class EmployeeController extends AbstractController
         return new Response($employeeJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-//    #[Route('/employee/{id}', methods: ['DELETE'])]
-//    public function deleteEmployee(int $id): Response
-//    {
-//        // GESTION DES ROLES
-//        // if (!$this->isGranted('ROLE_ADMIN')) {
-//        //     return $this->json(['message' => 'Access Denied'], Response::HTTP_FORBIDDEN);
-//        // }
-//
-//        try {
-//            $this->employeeService->delete($id);
-//
-//            return new Response(null, Response::HTTP_NO_CONTENT);
-//        } catch (\Exception $e) {
-//
-//            return $this->json(['message' => 'Error deleting employee: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    //    #[Route('/employee/{id}', methods: ['DELETE'])]
+    //    public function deleteEmployee(int $id): Response
+    //    {
+    //        // GESTION DES ROLES
+    //        // if (!$this->isGranted('ROLE_ADMIN')) {
+    //        //     return $this->json(['message' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+    //        // }
+    //
+    //        try {
+    //            $this->employeeService->delete($id);
+    //
+    //            return new Response(null, Response::HTTP_NO_CONTENT);
+    //        } catch (\Exception $e) {
+    //
+    //            return $this->json(['message' => 'Error deleting employee: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //        }
+    //    }
 }
