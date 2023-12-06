@@ -2,10 +2,16 @@
 
 namespace App\Filter;
 
+use JMS\Serializer\Annotation as Serializer;
+
 class AbsenceFilter
 {
+    #[Serializer\Groups(['default'])]
     private ?int $employee = null;
+
+    #[Serializer\Groups(['default'])]
     private ?int $restaurant = null;
+
     private ?\DateTimeImmutable $date = null;
 
     /**

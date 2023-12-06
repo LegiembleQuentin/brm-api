@@ -34,14 +34,14 @@ class AbsencesRepository extends ServiceEntityRepository
             ->addSelect('employee');
 
         if ($filters->getRestaurant()) {
-            $qb->innerJoin('employee.restaurants', 'restaurant')
+            $qb->innerJoin('employee.restaurant', 'restaurant')
                 ->addSelect('restaurant')
-                ->andWhere('restaurant.id = :restaurant')
+                ->andWhere('restaurant = :restaurant')
                 ->setParameter('restaurant', $filters->getRestaurant());
         }
 
         if ($filters->getEmployee()) {
-            $qb->andWhere('employee.id = :employee')
+            $qb->andWhere('employee = :employee')
                 ->setParameter('employee', $filters->getEmployee());
         }
 
@@ -52,12 +52,10 @@ class AbsencesRepository extends ServiceEntityRepository
 
         if ($filters->getDate()) {
             $date = $filters->getDate();
-            $startDate = $date->setTime(0, 0);
-            $endDate = $date->setTime(23, 59, 59);
+            $date->setTime(0, 0);
 
-            $qb->andWhere('a.date BETWEEN :startDate AND :endDate')
-                ->setParameter('startDate', $startDate)
-                ->setParameter('endDate', $endDate);
+            $qb->andWhere(':date BETWEEN a.start_date AND a.end_date')
+                ->setParameter('date', $date);
         }
 
         return $qb->getQuery()->getArrayResult();
