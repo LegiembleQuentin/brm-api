@@ -20,9 +20,9 @@ class EmployeeController extends AbstractController
     private $serializer;
     private $employeeService;
 
-    public function __construct(SerializerInterface $serializer, EmployeeService $employeeService)
+    public function __construct(EmployeeService $employeeService)
     {
-        $this->serializer = SerializerBuilder::create()->build();;
+        $this->serializer = SerializerBuilder::create()->build();
         $this->employeeService = $employeeService;
     }
 
@@ -51,7 +51,6 @@ class EmployeeController extends AbstractController
     #[Route('/employees-small', methods: ['GET'])]
     public function getEmployeesSmall(Request $request): Response
     {
-        //un jour arthur aura finit et j'aurai acces au roles inshallah
         try {
             $employees = $this->employeeService->findAll();
             $employeesJson = $this->serializer->serialize($employees, 'json', SerializationContext::create()->setGroups(['default']));

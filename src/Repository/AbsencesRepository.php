@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Absences;
+use App\Filter\AbsenceFilter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,47 @@ class AbsencesRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Absences::class);
+    }
+
+    /**
+     * @return Absences[] Returns an array of Absence objects
+     */
+    public function findAbsencesByFilter(AbsenceFilter $filters) : array
+    {
+        $qb = $this->createQueryBuilder('a');
+
+        // Join the employee table
+        $qb->innerJoin('a.employee', 'employee')
+            ->addSelect('employee');
+
+        if ($filters->getRestaurant()) {
+            $qb->innerJoin('employee.restaurants', 'restaurant')
+                ->addSelect('restaurant')
+                ->andWhere('restaurant.id = :restaurant')
+                ->setParameter('restaurant', $filters->getRestaurant());
+        }
+
+        if ($filters->getEmployee()) {
+            $qb->andWhere('employee.id = :employee')
+                ->setParameter('employee', $filters->getEmployee());
+        }
+
+        if ($filters->getRestaurant() && $filters->getRestaurant() != 0) {
+            $qb->andWhere('restaurant.id = :restaurant')
+                ->setParameter('restaurant', $filters->getRestaurant());
+        }
+
+        if ($filters->getDate()) {
+            $date = $filters->getDate();
+            $startDate = $date->setTime(0, 0);
+            $endDate = $date->setTime(23, 59, 59);
+
+            $qb->andWhere('a.date BETWEEN :startDate AND :endDate')
+                ->setParameter('startDate', $startDate)
+                ->setParameter('endDate', $endDate);
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 
 //    /**
