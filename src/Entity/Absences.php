@@ -27,6 +27,9 @@ class Absences
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Serializer\Groups(['absence'])]
+    #[Assert\Length(
+        max: 255,
+    )]
     private ?string $reason = null;
 
     #[ORM\Column]
@@ -35,6 +38,11 @@ class Absences
 
     #[ORM\Column(length: 255)]
     #[Serializer\Groups(['default', 'absence'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
     private ?string $type = null;
 
     #[ORM\Column]

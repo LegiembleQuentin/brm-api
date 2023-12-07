@@ -8,7 +8,6 @@ use App\Service\EmployeeService;
 use Exception;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
-use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
