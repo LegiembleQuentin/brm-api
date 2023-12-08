@@ -67,7 +67,26 @@ class AbsenceController extends AbstractController
             return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['feedback', 'default']));
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['absence', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/absence', methods:  ['PUT'])]
+    public function updateAbsence(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $absenceData = $content['body'];
+            $absenceJson = json_encode($absenceData);
+
+            $absence = $this->serializer->deserialize($absenceJson, Absences::class, 'json');
+
+            $result = $this->absenceService->update($absence);
+        }catch (Exception $e){
+            return new Response('Error processing request ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['absence', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 

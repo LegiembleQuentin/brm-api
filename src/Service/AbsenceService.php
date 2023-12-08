@@ -6,6 +6,8 @@ use App\Filter\AbsenceFilter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use ReflectionClass;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AbsenceService {
@@ -59,5 +61,41 @@ class AbsenceService {
         $this->em->flush();
 
         return $absence;
+    }
+
+    public function update(Absences $absence): Absences
+    {
+        $existingAbsence = $this->em->getRepository(Absences::class)->find($absence);
+
+        if (!$existingAbsence) {
+            throw new Exception('Absence not found');
+        }
+
+        $reflClass = new ReflectionClass($absence);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($reflClass->getProperties() as $property) {
+            $name = $property->getName();
+            if ($name !== 'id') {
+                $value = $propertyAccessor->getValue($absence, $name);
+                $propertyAccessor->setValue($existingAbsence, $name, $value);
+            }
+        }
+
+        $employeeId = $absence->getEmployee()->getId();
+        $employee = $this->employeeService->getEmployeeById($employeeId);
+
+        if(!$employee){
+            throw new Exception('Employee not found');
+        }
+        $existingAbsence->setEmployee($employee);
+
+        $errors = $this->validator->validate($existingAbsence);
+        if (count($errors) > 0){
+            throw new Exception('Invalid absence');
+        }
+
+        $this->em->flush();
+
+        return $existingAbsence;
     }
 }

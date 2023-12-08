@@ -85,7 +85,6 @@ class FeedbackService {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($reflClass->getProperties() as $property) {
             $name = $property->getName();
-            // Skip the ID property and collections
             if ($name !== 'id') {
                 $value = $propertyAccessor->getValue($feedback, $name);
                 $propertyAccessor->setValue($existingFeedback, $name, $value);
@@ -94,9 +93,12 @@ class FeedbackService {
 
         $this->setEmployeeIfWarning($existingFeedback);
         $author = $this->employeeService->getEmployeeById($feedback->getAuthor()->getId());
+        if(!$author){
+            throw new Exception('Author not found');
+        }
         $existingFeedback->setAuthor($author);
 
-        $errors = $this->validator->validate($feedback);
+        $errors = $this->validator->validate($existingFeedback);
         if (count($errors) > 0){
             throw new Exception('Invalid feedback');
         }
