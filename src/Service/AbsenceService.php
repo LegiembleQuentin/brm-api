@@ -40,6 +40,12 @@ class AbsenceService {
         return $absenceRepo->findAbsencesByFilter($filters);
     }
 
+    public function getAbsenceById(int $id): ?Absences
+    {
+        $feedbackRepo = $this->em->getRepository(Absences::class);
+        return $feedbackRepo->find($id);
+    }
+
     public function save(Absences $absence): Absences
     {
         $employeeId = $absence->getEmployee()->getId();
@@ -97,5 +103,20 @@ class AbsenceService {
         $this->em->flush();
 
         return $existingAbsence;
+    }
+
+    public function delete(int $id)
+    {
+        $absence = $this->getAbsenceById($id);
+        if (!$absence) {
+            throw new \LogicException('Absence not provided for deletion.');
+        }
+
+        try {
+            $this->em->remove($absence);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }

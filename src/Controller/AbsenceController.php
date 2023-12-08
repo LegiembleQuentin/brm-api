@@ -90,4 +90,18 @@ class AbsenceController extends AbstractController
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 
+    #[Route('/absence/{id}', methods: ['DELETE'])]
+    public function deleteAbsence(int $id): Response
+    {
+        // GESTION DES ROLES
+
+        try {
+            $this->absenceService->delete($id);
+
+            return new Response(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+
+            return $this->json(['message' => 'Error deleting absence: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
