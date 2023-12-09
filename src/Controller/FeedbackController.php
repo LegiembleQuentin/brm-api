@@ -22,9 +22,9 @@ class FeedbackController extends AbstractController
     private $serializer;
     private $feedbackService;
 
-    public function __construct(SerializerInterface $serializer, FeedbackService $feedbackService)
+    public function __construct(FeedbackService $feedbackService)
     {
-        $this->serializer = SerializerBuilder::create()->build();;
+        $this->serializer = SerializerBuilder::create()->build();
         $this->feedbackService = $feedbackService;
     }
 

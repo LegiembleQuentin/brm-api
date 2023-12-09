@@ -3,36 +3,54 @@
 namespace App\Entity;
 
 use App\Repository\AbsencesRepository;
+use JMS\Serializer\Annotation as Serializer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AbsencesRepository::class)]
 class Absences
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Serializer\Groups(['default', 'absence'])]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Serializer\Groups(['default', 'absence'])]
     private ?\DateTimeInterface $start_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(['default', 'absence'])]
     private ?\DateTimeInterface $end_date = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Serializer\Groups(['absence'])]
+    #[Assert\Length(
+        max: 255,
+    )]
     private ?string $reason = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['absence'])]
     private ?bool $approved = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['default', 'absence'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
     private ?string $type = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['absence'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'absences')]
+    #[Serializer\Groups(['absence'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Employee $employee = null;
 
