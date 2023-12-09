@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Stock;
 use App\Filter\StockFilter;
 use App\Service\StockService;
 use Exception;
@@ -44,5 +45,44 @@ class StockController extends AbstractController
             return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
         return new Response($stocksJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/stock', methods: ['POST'])]
+    public function addStock(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $absenceData = $content['body'];
+            $stockJson = json_encode($absenceData);
+
+            $stock = $this->serializer->deserialize($stockJson, Stock::class, 'json');
+
+            $result = $this->stockService->save($stock);
+
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/stock', methods:  ['PUT'])]
+    public function updateStock(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $absenceData = $content['body'];
+            $stockJson = json_encode($absenceData);
+
+            $stock = $this->serializer->deserialize($stockJson, Stock::class, 'json');
+
+            $result = $this->stockService->update($stock);
+        }catch (Exception $e){
+            return new Response('Error processing request ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 }
