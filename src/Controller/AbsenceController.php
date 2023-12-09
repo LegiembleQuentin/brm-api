@@ -104,4 +104,23 @@ class AbsenceController extends AbstractController
             return $this->json(['message' => 'Error deleting absence: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    #[Route('/absence/{id}', methods: ['GET'])]
+    public function getAbsence(int $id): Response
+    {
+        try {
+
+            $absence = $this->absenceService->getAbsenceById($id);
+
+            if (!$absence) {
+                return $this->json(['message' => 'Absence not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $absenceJson = $this->serializer->serialize($absence, 'json', SerializationContext::create()->setGroups(['absence', 'default']));
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($absenceJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
 }
