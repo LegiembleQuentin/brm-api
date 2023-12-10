@@ -22,7 +22,7 @@ class EmployeeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employee::class);
     }
 
-    public function findByFilter(EmployeeFilter $filters) : array
+    public function findEmployeesByFilter(EmployeeFilter $filters) : array
     {
         $qb = $this->createQueryBuilder('e');
 

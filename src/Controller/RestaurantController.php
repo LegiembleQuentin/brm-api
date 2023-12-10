@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Restaurant;
 use App\Service\RestaurantService;
+use Exception;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,16 +33,6 @@ class RestaurantController extends AbstractController
         return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-    //
-    //    #[Route('/employees', name: 'app_employees', methods: ['GET'])]
-    //    public function index(): Response
-    //    {
-    //        $employees = $this->employeeService->getEmployees();
-    //        $jsonContent = $this->serializer->serialize($employees, 'json');
-    //
-    //        return new Response($jsonContent, Response::HTTP_OK, ['Content-Type' => 'application/json']);
-    //    }
-
     #[Route('/restaurant/{id}', methods: ['GET'])]
     public function getRestaurant(int $id): Response
     {
@@ -55,6 +46,19 @@ class RestaurantController extends AbstractController
         $restaurantJson = $this->serializer->serialize($restaurant, 'json', SerializationContext::create()->setGroups(['restaurant', 'default']));
 
         return new Response($restaurantJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/restaurants-small', methods: ['GET'])]
+    public function getRestaurantsSmall(Request $request): Response
+    {
+        try {
+            $restaurants = $this->restaurantService->getRestaurant();
+            $restaurantsJson = $this->serializer->serialize($restaurants, 'json', SerializationContext::create()->setGroups(['default']));
+        } catch (Exception $e) {
+            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
     // #[Route('/restaurant', methods: ['POST'])]

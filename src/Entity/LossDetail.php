@@ -27,7 +27,7 @@ class LossDetail
     #[ORM\ManyToOne(inversedBy: 'lossDetails')]
     private ?Product $product = null;
 
-    #[ORM\ManyToOne(inversedBy: 'lossDetails')]
+    #[ORM\ManyToOne(cascade: ['remove'], inversedBy: 'lossDetails')]
     private ?Stock $stock = null;
 
     public function getId(): ?int

@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Employee;
 use App\Filter\EmployeeFilter;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,7 +28,7 @@ class EmployeeService
     /**
      * @return Employee[]
      */
-    public function getEmployees() : array
+    public function findAll() : array
     {
         $employeeRepo = $this->em->getRepository(Employee::class);
         return $employeeRepo->findAll();
@@ -41,7 +40,7 @@ class EmployeeService
     public function findByFilter(EmployeeFilter $filters) : array
     {
         $employeeRepo = $this->em->getRepository(Employee::class);
-        return $employeeRepo->findByFilter($filters);
+        return $employeeRepo->findEmployeesByFilter($filters);
     }
 
     public function getEmployeeById(int $id): ?Employee
@@ -55,12 +54,12 @@ class EmployeeService
         $restaurant = $this->restaurantService->getRestaurantById($employee->getRestaurant()->getId());
 
         if (!$restaurant){
-            throw new Exception("Restaurant not found.");
+            throw new Exception('Restaurant not found.');
         }
 
         $errors = $this->validator->validate($employee);
         if (count($errors) > 0) {
-            throw new Exception("Invalid employee");
+            throw new Exception('Invalid employee');
         }
 
         $employee->setRestaurant($restaurant);
@@ -76,17 +75,17 @@ class EmployeeService
     {
         $existingEmployee = $this->em->getRepository(Employee::class)->find($employee->getId());
         if (!$existingEmployee) {
-            throw new Exception("Employee not found.");
-        }
-
-        $errors = $this->validator->validate($employee);
-        if (count($errors) > 0) {
-            throw new Exception("Invalid employee" . $errors);
+            throw new Exception('Employee not found.');
         }
 
         $restaurant = $this->restaurantService->getRestaurantById($employee->getRestaurant()->getId());
         if (!$restaurant){
-            throw new Exception("Restaurant not found.");
+            throw new Exception('Restaurant not found.');
+        }
+
+        $errors = $this->validator->validate($employee);
+        if (count($errors) > 0) {
+            throw new Exception('Invalid employee');
         }
 
         $reflClass = new ReflectionClass($employee);
