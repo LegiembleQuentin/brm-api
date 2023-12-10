@@ -2,54 +2,65 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\StockRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 #[ORM\Entity(repositoryClass: StockRepository::class)]
-#[ApiResource]
 class Stock
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['default', 'stock'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['default', 'stock'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2)]
+    #[Serializer\Groups(['default', 'stock'])]
     private ?string $quantity = null;
 
     #[ORM\Column(length: 45)]
+    #[Serializer\Groups(['default', 'stock'])]
     private ?string $unit = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(['stock'])]
     private ?\DateTimeInterface $last_restock_date = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2, nullable: true)]
+    #[Serializer\Groups(['default', 'stock'])]
     private ?string $stock_level_alert = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['stock', 'default'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(['stock'])]
     private ?\DateTimeImmutable $modified_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'stocks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Serializer\Groups(['stock'])]
     private ?Restaurant $restaurant = null;
 
     #[ORM\OneToMany(mappedBy: 'stock', targetEntity: LossDetail::class)]
+    #[Serializer\Groups(['stock'])]
     private Collection $lossDetails;
 
     #[ORM\OneToMany(mappedBy: 'stock', targetEntity: ProductStock::class)]
+    #[Serializer\Groups(['stock'])]
     private Collection $productStocks;
 
     #[ORM\OneToMany(mappedBy: 'stock', targetEntity: StockOrderDetail::class)]
+    #[Serializer\Groups(['stock'])]
     private Collection $stockOrderDetails;
 
     public function __construct()
