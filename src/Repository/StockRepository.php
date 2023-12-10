@@ -44,7 +44,7 @@ class StockRepository extends ServiceEntityRepository
             $qb->andWhere('s.quantity <= s.stock_level_alert');
         }
 
-        return $qb->getQuery()->getArrayResult();
+        return $qb->getQuery()->getResult();
     }
 
 //    /**
