@@ -105,4 +105,19 @@ class StockService
 
         return $existingStock;
     }
+
+    public function delete(int $id)
+    {
+        $stock = $this->getStockById($id);
+        if (!$stock) {
+            throw new \LogicException('Stock not provided for deletion.');
+        }
+
+        try {
+            $this->em->remove($stock);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
 }

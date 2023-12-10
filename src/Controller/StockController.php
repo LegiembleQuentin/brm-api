@@ -52,8 +52,8 @@ class StockController extends AbstractController
     {
         try {
             $content = json_decode($request->getContent(), true);
-            $absenceData = $content['body'];
-            $stockJson = json_encode($absenceData);
+            $stockData = $content['body'];
+            $stockJson = json_encode($stockData);
 
             $stock = $this->serializer->deserialize($stockJson, Stock::class, 'json');
 
@@ -72,8 +72,8 @@ class StockController extends AbstractController
     {
         try {
             $content = json_decode($request->getContent(), true);
-            $absenceData = $content['body'];
-            $stockJson = json_encode($absenceData);
+            $stockData = $content['body'];
+            $stockJson = json_encode($stockData);
 
             $stock = $this->serializer->deserialize($stockJson, Stock::class, 'json');
 
@@ -105,5 +105,20 @@ class StockController extends AbstractController
         }
 
         return new Response($stockJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/stock/{id}', methods: ['DELETE'])]
+    public function deleteStock(int $id): Response
+    {
+        // GESTION DES ROLES
+
+        try {
+            $this->stockService->delete($id);
+
+            return new Response(null, Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+
+            return $this->json(['message' => 'Error deleting stock: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
