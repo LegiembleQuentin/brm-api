@@ -85,4 +85,25 @@ class StockController extends AbstractController
         $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
+
+    #[Route('/stock/{id}', methods: ['GET'])]
+    public function getStock(int $id): Response
+    {
+        try {
+            // gerer les droits
+            // ...
+
+            $stock = $this->stockService->getStockById($id);
+
+            if (!$stock) {
+                return $this->json(['message' => 'Stock not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $stockJson = $this->serializer->serialize($stock, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($stockJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
 }

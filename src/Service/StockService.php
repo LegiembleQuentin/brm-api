@@ -42,6 +42,12 @@ class StockService
         return $stockRepo->findStocksByFilter($stockFilter);
     }
 
+    public function getStockById(int $id): ?Stock
+    {
+        $stockRepo = $this->em->getRepository(Stock::class);
+        return $stockRepo->find($id);
+    }
+
     public function save(Stock $stock): Stock
     {
         $restaurant = $this->restaurantService->getRestaurantById($stock->getRestaurant()->getId());
