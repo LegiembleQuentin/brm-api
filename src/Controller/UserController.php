@@ -200,6 +200,30 @@ class UserController extends AbstractController
         return $this->json(['TOKEN' => $decode->token,'pass' => $decode->password, 'user' => $user->getEmail()]);
     }
 
+    #[Route('/login', name: 'login', methods: ['POST'])]
+    public function login(Request $request, EntityManagerInterface $em,JWTTokenManagerInterface $JWTManager,UserPasswordHasherInterface $passwordEncoder): JsonResponse
+    {
+        $decode = json_decode($request->getContent());
+        if (empty($decode)) {
+            return $this->json(['Error : ' => 'Body empty']);
+        }
+        $email = $decode->username;
+        $password = $decode->password;
 
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return  $this->json(['error' => 'Identifiants incorrects']);
+        }
+        $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
+        if (!$user) {
+            return $this->json(['error' => 'Identifiants ou mot de passe incorrect', 'code' => 401]);
+        }
+         if (!$passwordEncoder->isPasswordValid($user ,$password)) {
+             return $this->json(['error' => 'Identifiants ou mot de passe incorrect', 'code' => 401]);
+         }
+
+        $token = $JWTManager->create($user);
+
+    return $this->json(['token' => $token]);
+    }
 
 }
