@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: RestaurantRepository::class)]
 class Restaurant
@@ -30,7 +32,11 @@ class Restaurant
     #[Serializer\Groups(['restaurant'])]
     private ?string $postal_code = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: false)]
+    #[Assert\Length(
+        min: 5,
+        max: 15,
+    )]
     #[Serializer\Groups(['restaurant'])]
     private ?string $city = null;
 
@@ -64,6 +70,7 @@ class Restaurant
 
     #[ORM\Column]
     #[Serializer\Groups(['restaurant'])]
+
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]

@@ -36,7 +36,7 @@ class FeedbackController extends AbstractController
 
             $filters = $this->serializer->deserialize($jsonQuery, FeedbackFilter::class, 'json', DeserializationContext::create()->setGroups(['default']));
 
-            if($request->query->get('date') != 'null' && $request->query->get('date') != 'undefined'){
+            if ($request->query->get('date') != 'null' && $request->query->get('date') != 'undefined') {
                 $date = DateTimeImmutable::createFromFormat('D M d Y H:i:s e+', $request->query->get('date'));
                 $filters->setDate($date);
             }
@@ -46,8 +46,7 @@ class FeedbackController extends AbstractController
             $feedbacks = $this->feedbackService->findByFilter($filters);
 
             $feedbacksJson = $this->serializer->serialize($feedbacks, 'json', SerializationContext::create()->setGroups(['default', 'feedback']));
-
-        }catch (Exception $e){
+        } catch (Exception $e) {
             return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
@@ -65,7 +64,6 @@ class FeedbackController extends AbstractController
             $feedback = $this->serializer->deserialize($feedbackJson, Feedback::class, 'json');
 
             $result = $this->feedbackService->save($feedback);
-
         } catch (Exception $e) {
             return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
@@ -74,7 +72,7 @@ class FeedbackController extends AbstractController
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 
-    #[Route('/feedback', methods:  ['PUT'])]
+    #[Route('/feedback', methods: ['PUT'])]
     public function updateFeedback(Request $request): Response
     {
         try {
@@ -85,7 +83,7 @@ class FeedbackController extends AbstractController
             $feedback = $this->serializer->deserialize($feedbackJson, Feedback::class, 'json');
 
             $result = $this->feedbackService->update($feedback);
-        }catch (Exception $e){
+        } catch (Exception $e) {
             return new Response('Error processing request ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
