@@ -34,6 +34,16 @@ class StockService
     }
 
     /**
+     * @param int[] $stockIds
+     * @return Stock[]
+     */
+    public function getStockByIds(array $stockIds) : array
+    {
+        $stockRepo = $this->em->getRepository(Stock::class);
+        return $stockRepo->findBy(['id' => $stockIds]);
+    }
+
+    /**
      * @return Stock[]
      */
     public function findByFilter(StockFilter $stockFilter) : array

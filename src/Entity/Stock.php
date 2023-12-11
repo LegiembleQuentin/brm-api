@@ -28,7 +28,7 @@ class Stock
 
     #[ORM\Column(length: 45)]
     #[Serializer\Groups(['default', 'stock'])]
-    private ?string $unit = null;
+    private ?string $unit = 'kg';
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Serializer\Groups(['stock'])]
