@@ -17,16 +17,16 @@ class OrderProductFixtures extends Fixture implements DependentFixtureInterface
 
         $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 1; $i++) {
+        for ($i = 0; $i < 1500; $i++) {
             $orderProduct = new OrderProduct();
             $orderProduct->setQuantity($faker->randomFloat(0, 0, 6));
-            $orderProduct->setDate($faker->dateTimeThisDecade());
+            $orderProduct->setDate($faker->dateTimeBetween('-1 year', 'now'));
 
             $promotionCampaignReference = 'promotioncampaign-' . rand(0, 9);
             $promotionCampaign = $this->getReference($promotionCampaignReference);
             $orderProduct->setPromotionCampaign($promotionCampaign);
 
-            $orderReference = 'order-' . rand(0, 69);
+            $orderReference = 'order-' . rand(0, 699);
             $order = $this->getReference($orderReference);
             $orderProduct->setAssociatedOrder($order);
 

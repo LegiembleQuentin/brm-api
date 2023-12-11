@@ -49,7 +49,7 @@ class ProductController extends AbstractController
         return new Response($stocksJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-    #[Route('/product-small', methods: ['GET'])]
+    #[Route('/products-small', methods: ['GET'])]
     public function getProductSmall(Request $request): Response
     {
         try {
