@@ -46,7 +46,7 @@ class Product
     #[Serializer\Groups(['product'])]
     private Collection $lossDetails;
 
-    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductStock::class)]
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductStock::class, cascade: ['persist'])]
     #[Serializer\Groups(['product'])]
     private Collection $productStocks;
 
@@ -193,8 +193,12 @@ class Product
         return $this->productStocks;
     }
 
-    public function addProductStock(ProductStock $productStock): static
+    public function addProductStock(ProductStock $productStock): self
     {
+        if ($this->productStocks === null) {
+            $this->productStocks = new ArrayCollection();
+        }
+
         if (!$this->productStocks->contains($productStock)) {
             $this->productStocks->add($productStock);
             $productStock->setProduct($this);
@@ -321,5 +325,13 @@ class Product
 
             $this->productStocks->add($productStock);
         }
+    }
+
+    /**
+     * @Serializer\PostDeserialize
+     */
+    public function postDeserialize()
+    {
+        $this->productStocks = new ArrayCollection();
     }
 }

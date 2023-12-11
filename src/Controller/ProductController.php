@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\ProductStock;
+use App\Entity\Stock;
 use App\Filter\ProductFilter;
 use App\Service\ProductService;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
@@ -20,9 +23,11 @@ class ProductController extends AbstractController
 {
     private $serializer;
     private $productService;
+    private $em;
 
-    public function __construct(ProductService $productService)
+    public function __construct(EntityManagerInterface $entityManager, ProductService $productService)
     {
+        $this->em = $entityManager;
         $this->productService = $productService;
         $this->serializer = SerializerBuilder::create()->build();
     }
@@ -44,23 +49,71 @@ class ProductController extends AbstractController
         return new Response($stocksJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-//    #[Route('/product', methods: ['POST'])]
-//    public function addStock(Request $request): Response
-//    {
-//        try {
-//            $content = json_decode($request->getContent(), true);
-//            $productData = $content['body'];
-//            $productJson = json_encode($productData);
-//
-//            $product = $this->serializer->deserialize($productJson, Product::class, 'json');
-//
-//            $result = $this->productService->save($product);
-//
-//        } catch (Exception $e) {
-//            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
-//        }
-//
-//        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
-//        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
-//    }
+    #[Route('/product-small', methods: ['GET'])]
+    public function getProductSmall(Request $request): Response
+    {
+        try {
+            $products = $this->productService->getProduct();
+            $productsJson = $this->serializer->serialize($products, 'json', SerializationContext::create()->setGroups(['default']));
+        }catch (Exception $e) {
+            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($productsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/product', methods: ['POST'])]
+    public function addStock(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $productData = $content['body'];
+            $productJson = json_encode($productData);
+
+
+            $product = $this->serializer->deserialize($productJson, Product::class, 'json');
+
+            foreach ($productData['productStocks'] as $productStockData) {
+                $stock = $this->em->getRepository(Stock::class)->find($productStockData['stock']['id']);
+
+                if (!$stock) {
+                    throw new Exception("Stock with ID {$productStockData['stock']['id']} does not exist.");
+                }
+
+                $productStock = new ProductStock();
+                $productStock->setProduct($product);
+                $productStock->setStock($stock);
+                $productStock->setStockQuantity($productStockData['stock_quantity']);
+
+                $product->addProductStock($productStock);
+            }
+
+            $result = $this->productService->save($product);
+
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['product', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/product', methods:  ['PUT'])]
+    public function updateProduct(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $productData = $content['body'];
+            $productJson = json_encode($productData);
+
+            $product = $this->serializer->deserialize($productJson, Product::class, 'json');
+
+            $result = $this->productService->update($product);
+        }catch (Exception $e){
+            return new Response('Error processing request ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
 }

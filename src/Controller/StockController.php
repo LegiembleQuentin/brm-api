@@ -121,4 +121,17 @@ class StockController extends AbstractController
             return $this->json(['message' => 'Error deleting stock: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    #[Route('/stocks-small', methods: ['GET'])]
+    public function getStocksSmall(Request $request): Response
+    {
+        try {
+            $stocks = $this->stockService->getStocks();
+            $stocksJson = $this->serializer->serialize($stocks, 'json', SerializationContext::create()->setGroups(['default']));
+        }catch (Exception $e) {
+            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($stocksJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
 }
