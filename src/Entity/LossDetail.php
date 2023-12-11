@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\LossDetailRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 #[ORM\Entity(repositoryClass: LossDetailRepository::class)]
 class LossDetail
@@ -12,12 +13,15 @@ class LossDetail
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['default'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 7, scale: 2)]
+    #[Serializer\Groups(['default'])]
     private ?string $quantity = null;
 
     #[ORM\Column(length: 45)]
+    #[Serializer\Groups(['default'])]
     private ?string $unit = null;
 
     #[ORM\ManyToOne(inversedBy: 'lossDetails')]
@@ -27,7 +31,7 @@ class LossDetail
     #[ORM\ManyToOne(inversedBy: 'lossDetails')]
     private ?Product $product = null;
 
-    #[ORM\ManyToOne(inversedBy: 'lossDetails')]
+    #[ORM\ManyToOne(cascade: ['remove'], inversedBy: 'lossDetails')]
     private ?Stock $stock = null;
 
     public function getId(): ?int

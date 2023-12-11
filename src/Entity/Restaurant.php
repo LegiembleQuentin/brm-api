@@ -2,71 +2,98 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\RestaurantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: RestaurantRepository::class)]
-#[ApiResource]
 class Restaurant
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['restaurant', 'default'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['restaurant', 'default'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $adress = null;
 
     #[ORM\Column(length: 10)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $postal_code = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: false)]
+    #[Assert\Length(
+        min: 5,
+        max: 15,
+    )]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $country = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $operating_hours = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
+    #[Serializer\Groups(['restaurant'])]
     private ?string $rating = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(['restaurant'])]
     private ?\DateTimeInterface $open_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(['restaurant'])]
     private ?\DateTimeInterface $close_date = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['restaurant'])]
+
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['restaurant'])]
     private ?bool $enabled = null;
 
     #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: UserRestaurant::class)]
+    #[Serializer\Groups(['restaurant'])]
     private Collection $userRestaurants;
 
+    #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: Employee::class)]
+    #[Serializer\Groups(['restaurant'])]
+    private Collection $employees;
+
     #[ORM\OneToMany(mappedBy: 'restaurant', targetEntity: Stock::class)]
+    #[Serializer\Groups(['restaurant'])]
     private Collection $stocks;
 
     public function __construct()
     {
         $this->userRestaurants = new ArrayCollection();
         $this->stocks = new ArrayCollection();
+        $this->employees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -284,6 +311,36 @@ class Restaurant
             // set the owning side to null (unless already changed)
             if ($stock->getRestaurant() === $this) {
                 $stock->setRestaurant(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Employee>
+     */
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    public function addEmployee(Employee $employee): static
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees->add($employee);
+            $employee->setRestaurant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmployee(Employee $employee): static
+    {
+        if ($this->employees->removeElement($employee)) {
+            // set the owning side to null (unless already changed)
+            if ($employee->getRestaurant() === $this) {
+                $employee->setRestaurant(null);
             }
         }
 

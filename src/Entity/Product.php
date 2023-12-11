@@ -2,54 +2,70 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['product', 'default'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['product', 'default'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Serializer\Groups(['product', 'default'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(['product', 'default'])]
     private ?int $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Serializer\Groups(['product'])]
     private ?string $img_url = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['product'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(['product'])]
     private ?\DateTimeImmutable $modified_at = null;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: LossDetail::class)]
+    #[Serializer\Groups(['product'])]
     private Collection $lossDetails;
 
-    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductStock::class)]
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductStock::class, cascade: ['persist'])]
+    #[Serializer\Groups(['product'])]
     private Collection $productStocks;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: PromotionCampaign::class)]
+    #[Serializer\Groups(['product'])]
     private Collection $promotionCampaigns;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'products')]
+    #[Serializer\Groups(['product'])]
+    #[ORM\JoinTable(name: "product_category")]
     private Collection $category;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: OrderProduct::class)]
+    #[Serializer\Groups(['product'])]
     private Collection $orderProducts;
+
+
+    #[Serializer\Groups(['product'])]
+    private Collection $stocks;
 
     public function __construct()
     {
@@ -58,6 +74,8 @@ class Product
         $this->promotionCampaigns = new ArrayCollection();
         $this->category = new ArrayCollection();
         $this->orderProducts = new ArrayCollection();
+        $this->stocks = new ArrayCollection();
+        $this->initStock();
     }
 
     public function getId(): ?int
@@ -175,8 +193,12 @@ class Product
         return $this->productStocks;
     }
 
-    public function addProductStock(ProductStock $productStock): static
+    public function addProductStock(ProductStock $productStock): self
     {
+        if ($this->productStocks === null) {
+            $this->productStocks = new ArrayCollection();
+        }
+
         if (!$this->productStocks->contains($productStock)) {
             $this->productStocks->add($productStock);
             $productStock->setProduct($this);
@@ -279,5 +301,37 @@ class Product
         }
 
         return $this;
+    }
+
+    private function initStock(): void {
+        foreach ($this->productStocks as $productStock) {
+            $this->stocks[] = $productStock->getStock();
+        }
+    }
+
+    public function getStocks(): array {
+        $stocks = [];
+        foreach ($this->productStocks as $productStock) {
+            $stocks[] = $productStock->getStock();
+        }
+        return $stocks;
+    }
+
+    public function setStocks(array $stocks): void {
+        foreach ($stocks as $stock) {
+            $productStock = new ProductStock();
+            $productStock->setProduct($this);
+            $productStock->setStock($stock);
+
+            $this->productStocks->add($productStock);
+        }
+    }
+
+    /**
+     * @Serializer\PostDeserialize
+     */
+    public function postDeserialize()
+    {
+        $this->productStocks = new ArrayCollection();
     }
 }
