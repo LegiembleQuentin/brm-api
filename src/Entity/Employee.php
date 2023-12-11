@@ -16,12 +16,12 @@ class Employee
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Serializer\Groups(["default", "employee"])]
+    #[Serializer\Groups(['default', 'employee'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Serializer\Groups(["default", "employee"])]
+    #[Serializer\Groups(['default', 'employee'])]
     private ?string $role = null;
 
     #[ORM\Column(length: 20)]
@@ -29,7 +29,7 @@ class Employee
     #[Assert\Length(
         max: 5,
     )]
-    #[Serializer\Groups(["default", "employee"])]
+    #[Serializer\Groups(['default', 'employee'])]
     private ?string $sexe = null;
 
     #[ORM\Column(length: 255)]
@@ -38,7 +38,7 @@ class Employee
         min: 2,
         max: 255,
     )]
-    #[Serializer\Groups(["default", "employee"])]
+    #[Serializer\Groups(['default', 'employee'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -47,17 +47,17 @@ class Employee
         min: 2,
         max: 255,
     )]
-    #[Serializer\Groups(["default", "employee"])]
+    #[Serializer\Groups(['default', 'employee'])]
     private ?string $firstname = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotNull]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotNull]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?\DateTimeInterface $hire_date = null;
 
     #[ORM\Column(length: 255)]
@@ -66,7 +66,7 @@ class Employee
         min: 9,
         max: 12,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?string $phone = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -74,7 +74,7 @@ class Employee
         min: 5,
         max: 1000,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 10, nullable: true)]
@@ -82,7 +82,7 @@ class Employee
         min: 5,
         max: 5,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?string $postal_code = null;
 
     #[ORM\Column(length: 45, nullable: true)]
@@ -90,22 +90,22 @@ class Employee
         min: 5,
         max: 15,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?string $social_security_number = null;
 
     #[ORM\Column(length: 45)]
     #[Assert\Length(
         max: 40,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?string $contract_type = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?\DateTimeInterface $contract_end_date = null;
 
     #[ORM\Column]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?bool $disability = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -113,53 +113,53 @@ class Employee
         min: 5,
         max: 5000,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?string $disability_desc = null;
 
     #[ORM\Column]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?bool $enabled = null;
 
     #[ORM\Column(nullable: true)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(nullable: true)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?\DateTimeImmutable $modified_at = null;
 
     #[ORM\OneToOne(inversedBy: 'employee', cascade: ['persist', 'remove'])]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Feedback::class)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private Collection $feedback;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Feedback::class)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private Collection $concernedFeedback;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Warning::class)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private Collection $warnings;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: Absences::class)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private Collection $absences;
 
     #[ORM\OneToMany(mappedBy: 'employee', targetEntity: TimeSlot::class)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private Collection $timeSlots;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['employee'])]
     private ?Restaurant $restaurant = null;
   
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Serializer\Groups(["default", "employee"])]
+    #[Serializer\Groups(['default', 'employee'])]
     private ?string $email = null;
 
     public function __construct()

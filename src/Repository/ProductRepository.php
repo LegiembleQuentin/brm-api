@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Product;
+use App\Filter\ProductFilter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,28 @@ class ProductRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
+    }
+
+    public function findProductsByFilter(ProductFilter $filters) : array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.productStocks', 'ps')
+            ->leftJoin('ps.stock', 's');
+
+
+        $qb->addSelect('p', 'ps', 's');
+
+        if ($filters->getSearch() && $filters->getSearch() !== 'undefined') {
+            $searchTerm = '%' . str_replace(' ', '%', $filters->getSearch()) . '%';
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('p.name', ':search'),
+                    $qb->expr()->like('p.description', ':search')
+                )
+            )->setParameter('search', $searchTerm);
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 
 //    /**

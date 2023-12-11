@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Restaurant;
 use App\Service\RestaurantService;
+use Exception;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,16 +33,6 @@ class RestaurantController extends AbstractController
         return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-    //
-    //    #[Route('/employees', name: 'app_employees', methods: ['GET'])]
-    //    public function index(): Response
-    //    {
-    //        $employees = $this->employeeService->getEmployees();
-    //        $jsonContent = $this->serializer->serialize($employees, 'json');
-    //
-    //        return new Response($jsonContent, Response::HTTP_OK, ['Content-Type' => 'application/json']);
-    //    }
-
     #[Route('/restaurant/{id}', methods: ['GET'])]
     public function getRestaurant(int $id): Response
     {
@@ -57,21 +48,54 @@ class RestaurantController extends AbstractController
         return new Response($restaurantJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-    // #[Route('/restaurant', methods: ['POST'])]
-    // public function addRestaurant(Request $request, SerializerInterface $serializer): Response
-    // {
-    //     $content = $request->getContent();
+    #[Route('/restaurants-small', methods: ['GET'])]
+    public function getRestaurantsSmall(Request $request): Response
+    {
+        try {
+            $restaurants = $this->restaurantService->getRestaurant();
+            $restaurantsJson = $this->serializer->serialize($restaurants, 'json', SerializationContext::create()->setGroups(['default']));
+        } catch (Exception $e) {
+            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
 
-    //     $restaurant = $serializer->deserialize($content, Restaurant::class, 'json');
+        return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
 
-    //     if ($restaurant->getId() !== null) {
-    //         //retourner vers l'update
+    #[Route('/restaurant', methods: ['POST'])]
+    public function addRestaurant(Request $request, SerializerInterface $serializer): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $restaurantData = $content['body'];
+            $restaurantJson = json_encode($restaurantData);
 
-    //     }
+            $restaurant = $this->serializer->deserialize($restaurantJson, Restaurant::class, 'json');
 
-    //     // $result = $this->restaurantService->save($restaurant);
+            $result = $this->restaurantService->save($restaurant);
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
 
-    //     $jsonResponse = $this->serializer->serialize($result, 'json');
-    //     return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
-    // }
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['restaurant', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/restaurant', methods: ['PUT'])]
+    public function updateRestaurant(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $restaurantData = $content['body'];
+            $restaurantJson = json_encode($restaurantData);
+
+            $restaurant = $this->serializer->deserialize($restaurantJson, Restaurant::class, 'json');
+
+            $result = $this->restaurantService->update($restaurant);
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['restaurant', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
 }

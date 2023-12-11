@@ -2,39 +2,49 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\FeedbackRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use JMS\Serializer\Annotation as Serializer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FeedbackRepository::class)]
-#[ApiResource]
 class Feedback
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 5,
+        max: 5000,
+    )]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?string $content = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?bool $warning = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'feedback')]
+    #[ORM\ManyToOne(cascade:['persist'], inversedBy: 'feedback')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?Employee $author = null;
 
-    #[ORM\ManyToOne(inversedBy: 'concernedFeedback')]
+    #[ORM\ManyToOne(cascade:['persist'], inversedBy: 'concernedFeedback')]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?Employee $employee = null;
 
     #[ORM\OneToOne(mappedBy: 'feedback', cascade: ['persist', 'remove'])]
+    #[Serializer\Groups(['default', 'feedback'])]
     private ?Warning $relatedWarning = null;
 
     public function __construct()
