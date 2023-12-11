@@ -58,7 +58,7 @@ class AbsencesRepository extends ServiceEntityRepository
                 ->setParameter('date', $date);
         }
 
-        return $qb->getQuery()->getArrayResult();
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

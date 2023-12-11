@@ -59,7 +59,7 @@ class FeedbackRepository extends ServiceEntityRepository
                 ->setParameter('endOfDay', $endOfDay);
         }
 
-        return $qb->getQuery()->getArrayResult();
+        return $qb->getQuery()->getResult();
     }
 
 //    /**
