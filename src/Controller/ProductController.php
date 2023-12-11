@@ -116,4 +116,25 @@ class ProductController extends AbstractController
         $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['stock', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
+
+    #[Route('/product/{id}', methods: ['GET'])]
+    public function getProduct(int $id): Response
+    {
+        try {
+            // gerer les droits
+            // ...
+
+            $product = $this->productService->getProductById($id);
+
+            if (!$product) {
+                return $this->json(['message' => 'product not found'], Response::HTTP_NOT_FOUND);
+            }
+
+            $stockJson = $this->serializer->serialize($product, 'json', SerializationContext::create()->setGroups(['product', 'default']));
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($stockJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
 }

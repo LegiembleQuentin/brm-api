@@ -25,11 +25,13 @@ class ProductStock
     private ?string $unit = 'kg';
 
     #[ORM\ManyToOne(inversedBy: 'productStocks')]
+    #[Serializer\Groups(['product'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Stock $stock = null;
 
     #[ORM\ManyToOne(inversedBy: 'productStocks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Serializer\Groups(['stock'])]
     private ?Product $product = null;
 
     public function getId(): ?int
