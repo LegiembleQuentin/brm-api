@@ -37,10 +37,10 @@ class OrderController extends AbstractController
             $jsonQuery = json_encode($request->query->all());
             $filters = $this->serializer->deserialize($jsonQuery, OrderFilter::class, 'json', DeserializationContext::create()->setGroups(['default']));
 
-//            if ($request->query->get('date') != 'null' && $request->query->get('date') != 'undefined') {
-//                $date = DateTimeImmutable::createFromFormat('D M d Y H:i:s e+', $request->query->get('date'));
-//                $filters->setDate($date);
-//            }
+            if ($request->query->get('date') != 'null' && $request->query->get('date') != 'undefined') {
+                $date = DateTimeImmutable::createFromFormat('D M d Y H:i:s e+', $request->query->get('date'));
+                $filters->setDate($date);
+            }
 
             $orders = $this->orderService->findByFilter($filters);
 
