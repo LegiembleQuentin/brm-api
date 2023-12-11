@@ -61,21 +61,41 @@ class RestaurantController extends AbstractController
         return new Response($restaurantsJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
-    // #[Route('/restaurant', methods: ['POST'])]
-    // public function addRestaurant(Request $request, SerializerInterface $serializer): Response
-    // {
-    //     $content = $request->getContent();
+    #[Route('/restaurant', methods: ['POST'])]
+    public function addRestaurant(Request $request, SerializerInterface $serializer): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $restaurantData = $content['body'];
+            $restaurantJson = json_encode($restaurantData);
 
-    //     $restaurant = $serializer->deserialize($content, Restaurant::class, 'json');
+            $restaurant = $this->serializer->deserialize($restaurantJson, Restaurant::class, 'json');
 
-    //     if ($restaurant->getId() !== null) {
-    //         //retourner vers l'update
+            $result = $this->restaurantService->save($restaurant);
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
 
-    //     }
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['restaurant', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
 
-    //     // $result = $this->restaurantService->save($restaurant);
+    #[Route('/restaurant', methods: ['PUT'])]
+    public function updateRestaurant(Request $request): Response
+    {
+        try {
+            $content = json_decode($request->getContent(), true);
+            $restaurantData = $content['body'];
+            $restaurantJson = json_encode($restaurantData);
 
-    //     $jsonResponse = $this->serializer->serialize($result, 'json');
-    //     return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
-    // }
+            $restaurant = $this->serializer->deserialize($restaurantJson, Restaurant::class, 'json');
+
+            $result = $this->restaurantService->update($restaurant);
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['restaurant', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
 }

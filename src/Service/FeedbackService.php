@@ -11,7 +11,8 @@ use ReflectionClass;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FeedbackService {
+class FeedbackService
+{
     private $em;
     private $validator;
     private $employeeService;
@@ -26,7 +27,7 @@ class FeedbackService {
     /**
      * @return Feedback[]
      */
-    public function getFeedbacks() : array
+    public function getFeedbacks(): array
     {
         $feedbackRepo = $this->em->getRepository(Feedback::class);
         return $feedbackRepo->findAll();
@@ -41,7 +42,7 @@ class FeedbackService {
     /**
      * @return Feedback[]
      */
-    public function findByFilter(FeedbackFilter $filters) : array
+    public function findByFilter(FeedbackFilter $filters): array
     {
         $feedbackRepo = $this->em->getRepository(Feedback::class);
         return $feedbackRepo->findFeedbacksByFilter($filters);
@@ -53,7 +54,7 @@ class FeedbackService {
 
         $author = $this->employeeService->getEmployeeById(111);
 
-        if(!$author){
+        if (!$author) {
             throw new Exception('Author not found');
         }
         $feedback->setAuthor($author);
@@ -61,7 +62,7 @@ class FeedbackService {
         $this->setEmployeeIfWarning($feedback);
 
         $errors = $this->validator->validate($feedback);
-        if (count($errors) > 0){
+        if (count($errors) > 0) {
             throw new Exception('Invalid feedback');
         }
 
@@ -93,13 +94,13 @@ class FeedbackService {
 
         $this->setEmployeeIfWarning($existingFeedback);
         $author = $this->employeeService->getEmployeeById($feedback->getAuthor()->getId());
-        if(!$author){
+        if (!$author) {
             throw new Exception('Author not found');
         }
         $existingFeedback->setAuthor($author);
 
         $errors = $this->validator->validate($existingFeedback);
-        if (count($errors) > 0){
+        if (count($errors) > 0) {
             throw new Exception('Invalid feedback');
         }
 
@@ -108,7 +109,8 @@ class FeedbackService {
         return $existingFeedback;
     }
 
-    public function setEmployeeIfWarning($feedback) {
+    public function setEmployeeIfWarning($feedback)
+    {
         if ($feedback->isWarning() && $feedback->getEmployee() != null) {
             $employeeId = $feedback->getEmployee()->getId();
             $employee = $this->employeeService->getEmployeeById($employeeId);
@@ -120,7 +122,7 @@ class FeedbackService {
             $feedback->setEmployee($employee);
         }
         //pour l'update
-        if (!$feedback->isWarning()){
+        if (!$feedback->isWarning()) {
             $feedback->setEmployee(null);
         }
     }
@@ -139,5 +141,4 @@ class FeedbackService {
             throw $e;
         }
     }
-
 }
