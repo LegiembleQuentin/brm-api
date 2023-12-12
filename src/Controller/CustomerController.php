@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Customer;
 use App\Filter\CustomerFilter;
 use App\Service\CustomerService;
 use Exception;
@@ -23,29 +24,51 @@ class CustomerController extends AbstractController
 
     public function __construct(SerializerInterface $serializer, CustomerService $customerService)
     {
-        $this->serializer = SerializerBuilder::create()->build();;
+        $this->serializer = $serializer;
         $this->customerService = $customerService;
     }
 
-    #[Route('/customer', methods: ['GET'])]
-    public function getCustomers(Request $request, SerializerInterface $serializer): Response
+    #[Route('/customers', name: 'app_customers', methods: ['GET'])]
+    public function index(): Response
     {
-        //gerer les droits/roles?
-
-        try {
-            $jsonQuery = json_encode($request->query->all());
-
-            $filters = $serializer->deserialize($jsonQuery, CustomerFilter::class, 'json');
-
-            $enabled = $request->query->get('enabled') === 'true';
-            $filters->setEnabled($enabled);
-        } catch (Exception $e) {
-            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
-        }
-
-        $customer = $this->customerService->findByFilter($filters);
+        $customer = $this->customerService->getCustomer();
         $customerJson = $this->serializer->serialize($customer, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
 
         return new Response($customerJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+
+    #[Route('/customer/{id}', methods: ['GET'])]
+    public function getCustomer(int $id): Response
+    {
+        //gerer les droits
+        $customer = $this->customerService->getCustomerById($id);
+
+        if (!$customer) {
+            return $this->json(['message' => 'customer not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $customerJson = $this->serializer->serialize($customer, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
+
+        return new Response($customerJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
+
+    #[Route('/customer', methods: ['POST'])]
+    public function updateCustomer(Request $request): Response
+    {
+
+        try {
+            $content = json_decode($request->getContent(), true);
+            $customerData = $content['body'];
+            $customerJson = json_encode($customerData);
+
+            $customer = $this->serializer->deserialize($customerJson, Customer::class, 'json');
+            $result = $this->customerService->update($customer);
+        } catch (Exception $e) {
+            return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
+        return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
     }
 }

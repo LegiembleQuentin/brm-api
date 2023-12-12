@@ -16,11 +16,18 @@ class StockFixtures extends Fixture
         $faker = Factory::create('fr_FR');
 
         for ($i = 0; $i < 10; $i++) {
+            $productName = $faker->unique()->randomElement(['Tomate', 'Oignon', 'Cheddar', 'Salade', 'Oignon frit', 'Steak', 'Raclette', 'Galette de Pomme de Terre', 'Tenders de Poulet', 'Chèvre']);
+
             $stock = new Stock();
-            $stock->setName($faker->unique()->randomElement(['Tomate', 'Oignon', 'Cheddar', 'Salade', 'Oignon frit', 'Steak', 'Raclette', 'Galette de Pomme de Terre', 'Tenders de Poulet', 'Chèvre']));
-            $stock->setQuantity($faker->randomFloat(2, 0.1, 50));
+            $stock->setName($productName);
             $stock->setUnit('Kilogramme');
-            $stock->setLastRestockDate($faker->dateTimeThisDecade());
+
+            $stock->setQuantity($this->generateRealisticQuantity($productName, $faker));
+
+            // $stock->setLastRestockDate($faker->dateTimeThisDecade());
+            $startDate = $faker->dateTimeBetween('-1 week', 'now');
+
+            $stock->setLastRestockDate($startDate);
             $stock->setCreatedAt(new \DateTimeImmutable());
 
             $restaurantReference = 'restaurant-' . rand(0, 14);
@@ -33,5 +40,20 @@ class StockFixtures extends Fixture
         }
 
         $manager->flush();
+    }
+
+    private function generateRealisticQuantity(string $productName, $faker): float
+    {
+        switch ($productName) {
+            case 'Tomate':
+                return $faker->randomFloat(2, 1, 5);
+            case 'Oignon':
+                return $faker->randomFloat(2, 0.5, 3);
+            case 'Cheddar':
+                return $faker->randomFloat(2, 0.2, 2);
+
+            default:
+                return $faker->randomFloat(2, 0.1, 50);
+        }
     }
 }

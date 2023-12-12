@@ -44,12 +44,13 @@ class Customer
     #[Serializer\Groups(["default", "customer"])]
     private ?string $email = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
     #[Assert\Length(
         min: 9,
         max: 12,
     )]
-    #[Serializer\Groups(["employee"])]
+    #[Serializer\Groups(['customer'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -57,21 +58,39 @@ class Customer
     private ?string $country = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 1000,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $adress = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 5,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $postal_code = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(['customer'])]
     private ?\DateTimeInterface $last_command = null;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 5, nullable: true)]
+    #[Serializer\Groups(['customer'])]
     private ?int $fidelity_points = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(['customer'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Order::class)]

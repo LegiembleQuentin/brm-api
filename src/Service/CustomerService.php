@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Customer;
+use App\Entity\Restaurant;
 use App\Filter\CustomerFilter;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,12 +16,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomerService
 {
-    private $em;
+    private $entityManager;
     private $validator;
 
     public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
-        $this->em = $entityManager;
+        $this->entityManager = $entityManager;
         $this->validator = $validator;
     }
 
@@ -29,17 +30,64 @@ class CustomerService
      */
     public function getCustomer(): array
     {
-        $customerRepo = $this->em->getRepository(Customer::class);
+        $customerRepo = $this->entityManager->getRepository(Customer::class);
         return $customerRepo->findAll();
     }
+
+    public function getCustomerById(int $id): ?customer
+    {
+        $customerRepo = $this->entityManager->getRepository(Customer::class);
+        return $customerRepo->find($id);
+    }
+
 
     /**
      * @return Customer[]
      */
     public function findByFilter(CustomerFilter $filters): array
     {
-        return $this->em->getRepository(Customer::class)->findByFilter($filters);
+        return $this->entityManager->getRepository(Customer::class)->findByFilter($filters);
+    }
 
+    public function save(Customer $customer): Customer
+    {
+
+        $errors = $this->validator->validate($customer);
+        if (count($errors) > 0) {
+            throw new Exception('Invalid employee');
+        }
+
+        $customer->setCreatedAt(new DateTimeImmutable('now'));
+
+        $this->entityManager->persist($customer);
+        $this->entityManager->flush();
+
+        return $customer;
+    }
+
+    public function update(Customer $customer): Customer
+    {
+        $existingCustomer = $this->entityManager->getRepository(Customer::class)->find($customer->getId());
+        if (!$existingCustomer) {
+            throw new Exception('Customer not found.');
+        }
+        $errors = $this->validator->validate($customer);
+        if (count($errors) > 0) {
+            throw new Exception('Invalid customer');
+        }
+        $reflClass = new ReflectionClass($customer);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($reflClass->getProperties() as $property) {
+            $name = $property->getName();
+            // Skip the ID property and collections
+            if ($name !== 'id' && !$property->getValue($existingCustomer) instanceof Collection) {
+                $value = $propertyAccessor->getValue($customer, $name);
+                $propertyAccessor->setValue($existingCustomer, $name, $value);
+            }
+        }
+
+        $this->entityManager->flush();
+        return $existingCustomer;
     }
 
     // public function getEmployeeById(int $id): ?Employee
