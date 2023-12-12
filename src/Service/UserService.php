@@ -22,7 +22,7 @@ class UserService
 
         $token = bin2hex(random_bytes(32));
         $expiry = date_create_immutable('+1');
-        $expiry = $expiry->modify('+2 day');
+        $expiry = $expiry->modify('+3 day');
 
         $user->setEmail($employee->getEmail());
         $user->setUsername($employee->getEmail());
