@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 class Customer
@@ -15,42 +16,81 @@ class Customer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Serializer\Groups(['default'])]
+    #[Serializer\Groups(["default", "customer"])]
+
     private ?int $id = null;
 
+
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(['default'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
+    #[Serializer\Groups(["default", "customer"])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(['default'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
+    #[Serializer\Groups(["default", "customer"])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Email]
+    #[Serializer\Groups(["default", "customer"])]
     private ?string $email = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\Length(
+        min: 9,
+        max: 12,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Serializer\Groups(["customer"])]
     private ?string $country = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 1000,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $adress = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Assert\Length(
+        min: 5,
+        max: 5,
+    )]
+    #[Serializer\Groups(['customer'])]
     private ?string $postal_code = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Serializer\Groups(['customer'])]
     private ?\DateTimeInterface $last_command = null;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 5, nullable: true)]
+    #[Serializer\Groups(['customer'])]
     private ?int $fidelity_points = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
+    #[Serializer\Groups(['customer'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Order::class)]

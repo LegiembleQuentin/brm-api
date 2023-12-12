@@ -23,9 +23,11 @@ class AbsencesFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 0; $i < 65; $i++) {
 
             $absences = new Absences();
+            $startDate = $faker->dateTimeBetween('-3 weeks', 'now');
+            $endDate = $faker->dateTimeBetween($startDate, '+2 hours');
 
-            $absences->setStartDate($faker->dateTimeThisDecade());
-            $absences->setEndDate($faker->dateTimeThisDecade());
+            $absences->setStartDate($startDate);
+            $absences->setEndDate($endDate);
             $absences->setReason($faker->randomElement([
                 $faker->text(20), null
             ]));
