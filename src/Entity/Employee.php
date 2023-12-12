@@ -71,7 +71,6 @@ class Employee
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\Length(
-        min: 5,
         max: 1000,
     )]
     #[Serializer\Groups(['employee'])]
@@ -79,7 +78,6 @@ class Employee
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Assert\Length(
-        min: 5,
         max: 5,
     )]
     #[Serializer\Groups(['employee'])]
@@ -87,7 +85,6 @@ class Employee
 
     #[ORM\Column(length: 45, nullable: true)]
     #[Assert\Length(
-        min: 5,
         max: 15,
     )]
     #[Serializer\Groups(['employee'])]
@@ -110,7 +107,6 @@ class Employee
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\Length(
-        min: 5,
         max: 5000,
     )]
     #[Serializer\Groups(['employee'])]
