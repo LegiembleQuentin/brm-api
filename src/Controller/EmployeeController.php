@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Employee;
 use App\Filter\EmployeeFilter;
 use App\Service\EmployeeService;
+use App\Service\UserService;
 use Exception;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
@@ -18,11 +19,13 @@ class EmployeeController extends AbstractController
 {
     private $serializer;
     private $employeeService;
+    private $userService;
 
-    public function __construct(EmployeeService $employeeService)
+    public function __construct(EmployeeService $employeeService, UserService $userService)
     {
         $this->serializer = SerializerBuilder::create()->build();
         $this->employeeService = $employeeService;
+        $this->userService = $userService;
     }
 
     #[Route('/employees', methods: ['GET'])]
@@ -70,6 +73,19 @@ class EmployeeController extends AbstractController
 
             $employee = $this->serializer->deserialize($employeeJson, Employee::class, 'json');
 
+            if ($employee->getRole() === 'DIRECTOR' || $employee->getRole() === 'MANAGER') {
+                try {
+                    $link = $this->addUser($employee);
+
+                    $responseData = ['link' => $link];
+                    $jsonResponse = json_encode($responseData);
+
+                    return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+                } catch (Exception $e) {
+                    return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+                }
+            }
+
             $result = $this->employeeService->save($employee);
         } catch (Exception $e) {
             return new Response('Error processing request: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
@@ -77,6 +93,19 @@ class EmployeeController extends AbstractController
 
         $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['employee', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+    private function addUser($employee)
+    {
+        try {
+            $this->employeeService->save($employee);
+        }catch (Exception $e) {
+            throw new Exception('Error when creating employee' . $e->getMessage());
+        }
+
+        $link = $this->userService->addUser($employee);
+
+        return $link;
     }
 
     #[Route('/employee', methods: ['PUT'])]

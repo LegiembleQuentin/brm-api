@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OrderProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 #[ORM\Entity(repositoryClass: OrderProductRepository::class)]
 class OrderProduct
@@ -12,12 +13,15 @@ class OrderProduct
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['default'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Serializer\Groups(['default'])]
     private ?int $quantity = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Serializer\Groups(['default'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderProducts')]
@@ -26,6 +30,7 @@ class OrderProduct
 
     #[ORM\ManyToOne(inversedBy: 'orderProducts')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Serializer\Groups(['order'])]
     private ?Product $product = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderProducts')]

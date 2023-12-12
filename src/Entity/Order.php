@@ -2,36 +2,41 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ApiResource]
 class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['default', 'order'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Serializer\Groups(['default', 'order'])]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Serializer\Groups(['default', 'order'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 255)]
+    #[Serializer\Groups(['default', 'order'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Serializer\Groups(['order'])]
     private ?Customer $customer = null;
 
     #[ORM\OneToMany(mappedBy: 'associated_order', targetEntity: OrderProduct::class)]
+    #[Serializer\Groups(['order'])]
     private Collection $orderProducts;
 
     public function __construct()

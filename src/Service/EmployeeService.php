@@ -59,7 +59,7 @@ class EmployeeService
 
         $errors = $this->validator->validate($employee);
         if (count($errors) > 0) {
-            throw new Exception('Invalid employee');
+            throw new Exception('Invalid employee' . $errors);
         }
 
         $employee->setRestaurant($restaurant);

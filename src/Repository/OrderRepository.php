@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Order;
+use App\Filter\OrderFilter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,40 @@ class OrderRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Order::class);
+    }
+
+    public function findOrdersByFilter(OrderFilter $filters) : array
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.orderProducts', 'op')
+            ->leftJoin('op.product', 'p');
+
+        if ($filters->getDate()) {
+            $date = $filters->getDate();
+            $startOfDay = $date->setTime(0, 0);
+            $endOfDay = $date->setTime(23, 59, 59);
+
+            $qb->andWhere('e.created_at BETWEEN :startOfDay AND :endOfDay')
+                ->setParameter('startOfDay', $startOfDay)
+                ->setParameter('endOfDay', $endOfDay);
+        }
+
+        if ($filters->getCustomer() && $filters->getCustomer() != 0) {
+            $qb->andWhere('o.customer = :customer')
+                ->setParameter('customer', $filters->getCustomer());
+        }
+
+        if ($filters->getStatus()) {
+            $qb->andWhere('o.status = :status')
+                ->setParameter('status', $filters->getStatus());
+        }
+
+        if ($filters->getProduct() && $filters->getProduct() != 0) {
+            $qb->andWhere('p.id = :product')
+                ->setParameter('product', $filters->getProduct());
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**

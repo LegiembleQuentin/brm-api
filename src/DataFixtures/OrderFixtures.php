@@ -17,7 +17,7 @@ class OrderFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 70; $i++) {
+        for ($i = 0; $i < 700; $i++) {
             $order = new Order();
             $order->setDate($faker->dateTimeThisDecade());
             $order->setStatus($faker->randomElement(['Paid', 'Canceled']));
