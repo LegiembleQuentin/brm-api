@@ -41,13 +41,16 @@ class CustomerService
     }
 
 
+
     /**
      * @return Customer[]
      */
     public function findByFilter(CustomerFilter $filters): array
     {
-        return $this->entityManager->getRepository(Customer::class)->findByFilter($filters);
+        $customerRepo = $this->entityManager->getRepository(Customer::class);
+        return $customerRepo->findCustomersByFilter($filters);
     }
+
 
     public function save(Customer $customer): Customer
     {

@@ -28,14 +28,14 @@ class CustomerController extends AbstractController
         $this->customerService = $customerService;
     }
 
-    #[Route('/customers', name: 'app_customers', methods: ['GET'])]
-    public function index(): Response
-    {
-        $customer = $this->customerService->getCustomer();
-        $customerJson = $this->serializer->serialize($customer, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
+    // #[Route('/customers', name: 'app_customers', methods: ['GET'])]
+    // public function index(): Response
+    // {
+    //     $customer = $this->customerService->getCustomer();
+    //     $customerJson = $this->serializer->serialize($customer, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
 
-        return new Response($customerJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
-    }
+    //     return new Response($customerJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    // }
 
 
     #[Route('/customer/{id}', methods: ['GET'])]
@@ -70,5 +70,24 @@ class CustomerController extends AbstractController
 
         $jsonResponse = $this->serializer->serialize($result, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
         return new Response($jsonResponse, Response::HTTP_CREATED, ['Content-Type' => 'application/json']);
+    }
+
+
+    #[Route('/customers', methods: ['GET'])]
+    public function getCustomers(Request $request): Response
+    {
+        //gerer les droits/roles?
+
+        try {
+            $jsonQuery = json_encode($request->query->all());
+
+            $filters = $this->serializer->deserialize($jsonQuery, CustomerFilter::class, 'json');
+            $customers = $this->customerService->findByFilter($filters);
+            $customersJson = $this->serializer->serialize($customers, 'json', SerializationContext::create()->setGroups(['customer', 'default']));
+        } catch (Exception $e) {
+            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($customersJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 }

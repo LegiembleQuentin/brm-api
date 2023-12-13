@@ -22,7 +22,7 @@ class CustomerRepository extends ServiceEntityRepository
         parent::__construct($registry, Customer::class);
     }
 
-    public function findByFilter(CustomerFilter $filters): array
+    public function findCustomersByFilter(CustomerFilter $filters): array
     {
         $qb = $this->createQueryBuilder('e');
 
@@ -34,7 +34,7 @@ class CustomerRepository extends ServiceEntityRepository
                     $qb->expr()->like('e.firstname', ':search'),
                     $qb->expr()->like('e.email', ':search'),
                     $qb->expr()->like(
-                        $qb->expr()->concat('e.firstname', $qb->expr()->concat($qb->expr()->literal(' '), 'e.name')),
+                        $qb->expr()->concat('e.firstname', $qb->expr()->concat($qb->expr()->literal(' '), 'e.lastname')),
                         ':search'
                     ),
                     $qb->expr()->like(
