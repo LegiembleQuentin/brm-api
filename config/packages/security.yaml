@@ -59,7 +59,6 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/setpassword, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify-token, roles: PUBLIC_ACCESS }
-        - { path: ^/api/employees,       roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/api, roles: [ROLE_MANAGER, ROLE_DIRECTOR, ROLE_ADMIN] }
 
 
