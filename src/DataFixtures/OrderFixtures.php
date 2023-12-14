@@ -19,7 +19,7 @@ class OrderFixtures extends Fixture implements DependentFixtureInterface
 
         for ($i = 0; $i < 700; $i++) {
             $order = new Order();
-            $order->setDate($faker->dateTimeThisDecade());
+            $order->setDate($faker->dateTimeThisYear());
             $order->setStatus($faker->randomElement(['Paid', 'Canceled']));
 
             $customerReference = 'customer-' . rand(0, 49);

@@ -79,7 +79,7 @@ class OrderRepository extends ServiceEntityRepository
 
         // Ventes par mois
         $qbMonthly = $this->createQueryBuilder('o')
-            ->select('SUBSTRING(o.date, 6, 2) as month', 'AVG(o.price) as averageSales')
+            ->select('SUBSTRING(o.date, 6, 2) as month', 'SUM(o.price) as averageSales')
             ->where('SUBSTRING(o.date, 1, 4) = :currentYear')
             ->setParameter('currentYear', $currentYear)
             ->groupBy('month');
