@@ -30,7 +30,7 @@ class StockFixtures extends Fixture
             $stock->setLastRestockDate($startDate);
             $stock->setCreatedAt(new \DateTimeImmutable());
 
-            $restaurantReference = 'restaurant-' . rand(0, 14);
+            $restaurantReference = 'restaurant-' . rand(0, 4);
             $restaurant = $this->getReference($restaurantReference);
             $stock->setRestaurant($restaurant);
 

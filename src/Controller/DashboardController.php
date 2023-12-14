@@ -47,4 +47,19 @@ class DashboardController extends AbstractController
 
         return new Response($salesJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
+
+    #[Route('/dashboard/absences', methods: ['GET'])]
+    public function getAbsences(): Response
+    {
+        try{
+            $absences = $this->dashboardService->getAbsences();
+
+            $absencesJson = $this->serializer->serialize($absences, 'json');
+        }catch (\Exception $e)
+        {
+            return new Response('Invalid input: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+
+        return new Response($absencesJson, Response::HTTP_OK, ['Content-Type' => 'application/json']);
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Absences;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -20,11 +21,13 @@ class AbsencesFixtures extends Fixture implements DependentFixtureInterface
 
         $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 65; $i++) {
+        for ($i = 0; $i < 800; $i++) {
 
             $absences = new Absences();
-            $startDate = $faker->dateTimeBetween('-3 weeks', 'now');
-            $endDate = $faker->dateTimeBetween($startDate, '+2 hours');
+
+            $startOfYear = new DateTime(date('Y-01-01'));
+            $startDate = $faker->dateTimeBetween($startOfYear);
+            $endDate = $faker->dateTimeInInterval($startDate, '+7 days');
 
             $absences->setStartDate($startDate);
             $absences->setEndDate($endDate);

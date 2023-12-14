@@ -15,7 +15,7 @@ class RestaurantFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $restaurant = new Restaurant();
             $restaurant->setName($faker->city());
             $restaurant->setAdress($faker->streetAddress());

@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Absences;
 use App\Entity\Order;
 use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,13 @@ class DashboardService
         $orderRepo = $this->em->getRepository(Order::class);
         $sales = $orderRepo->getAverageSalesForYear();
         return $sales;
+    }
+
+    public function getAbsences()
+    {
+        $absenceRepo = $this->em->getRepository(Absences::class);
+        $absences = $absenceRepo->getAbsenceRatesByRestaurant();
+        return $absences;
     }
 
 }
