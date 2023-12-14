@@ -58,9 +58,16 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
 
-        #- { path: ^/api,       roles: IS_AUTHENTICATED_FULLY}
-        - { path: ^/api,       roles: PUBLIC_ACCESS}
-        - { path: ^/api/employees,       roles: PUBLIC_ACCESS}
+        - { path: ^/api/employees,       roles: IS_AUTHENTICATED_FULLY}
+
+              # Autoriser l'accès public à la route de vérification de token
+        - { path: ^/api/verify-token, roles: PUBLIC_ACCESS }
+
+              # Autoriser l'accès public à la route de définition de mot de passe
+        - { path: ^/api/setPassword, roles: PUBLIC_ACCESS }
+
+              # Protéger toutes les autres routes /api
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 
 when@test:
