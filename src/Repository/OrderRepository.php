@@ -33,7 +33,7 @@ class OrderRepository extends ServiceEntityRepository
             $startOfDay = $date->setTime(0, 0);
             $endOfDay = $date->setTime(23, 59, 59);
 
-            $qb->andWhere('e.created_at BETWEEN :startOfDay AND :endOfDay')
+            $qb->andWhere('o.date BETWEEN :startOfDay AND :endOfDay')
                 ->setParameter('startOfDay', $startOfDay)
                 ->setParameter('endOfDay', $endOfDay);
         }
