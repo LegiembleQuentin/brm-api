@@ -42,7 +42,7 @@ class EmployeeFixtures extends Fixture implements DependentFixtureInterface
             $employee->setEnabled($faker->boolean(80));
             $employee->setCreatedAt(new \DateTimeImmutable());
 
-            $restaurantReference = 'restaurant-' . rand(0, 14);
+            $restaurantReference = 'restaurant-' . rand(0, 4);
             $restaurant = $this->getReference($restaurantReference);
             $employee->setRestaurant($restaurant);
             $manager->persist($employee);

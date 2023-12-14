@@ -44,28 +44,16 @@ class ProductRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
-//    /**
-//     * @return Product[] Returns an array of Product objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getProductSales() : array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.name as productName')
+            ->addSelect('SUM(op.quantity) as salesQuantity')
+            ->addSelect('(SUM(op.quantity) * p.price) as price')
+            ->leftJoin('p.orderProducts', 'op')
+            ->groupBy('p.id')
+            ->orderBy('salesQuantity', 'DESC');
 
-//    public function findOneBySomeField($value): ?Product
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $qb->getQuery()->getArrayResult();
+    }
 }
