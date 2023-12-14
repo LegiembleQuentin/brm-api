@@ -46,40 +46,6 @@ class UserController extends AbstractController
         $this->jwtManager = $jwtManager;
     }
 
-        //Add admin function, no token necessary.
-    #[Route('/addadmin', name: 'app_addadmin', methods: "POST")]
-    public function addAdmin(Request $request,SerializerInterface $serializer, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder): JsonResponse
-    {
-        $decoded = json_decode($request->getContent());
-        if (!empty($decoded)) {
-            $email = $decoded->email;
-            $password = $decoded->password;
-            $username = $decoded->username;
-            $roles = $decoded->roles;
-            $enabled = $decoded->enabled;
-            //$datetime = 'now';
-            $created_at = date_create_immutable();
-
-            $user = new User();
-            $hashedPassword = $passwordEncoder->hashPassword($user, $password);
-
-
-            $user->setEmail($email);
-            $user->setUsername($username);
-            $user->setPassword($hashedPassword);
-            $user->setEnabled($enabled);
-            $user->setRoles($roles);
-            $user->setCreatedAt($created_at);
-            $em->persist($user);
-            $em->flush();
-
-
-        } else {
-            return $this->json(['' => 'Error, empty body data']);
-        }
-        return $this->json(['' => 'registered & enabled']);
-
-    }
     #[Route('/verify-token', name: 'verify_token', methods: "POST")]
     public function verifyToken(Request $request, EntityManagerInterface $em): JsonResponse {
         $decode = json_decode($request->getContent());
@@ -92,11 +58,6 @@ class UserController extends AbstractController
         return $this->json(['valid' => true]);
     }
 
-    //#[Route('/test', name: 'test', methods: "GET")]
-    //public function test(Request $request, EntityManagerInterface $em): JsonResponse
-    //{
-        //return $this->json(['valid' => true]);
-    //}
     #[Route('/setpassword', name: 'setpassword', methods: "POST")]
     public function setPassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordEncoder): JsonResponse
     {
@@ -152,5 +113,4 @@ class UserController extends AbstractController
 
     return $this->json(['token' => $token]);
     }
-
 }

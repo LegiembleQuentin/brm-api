@@ -33,7 +33,7 @@ class OrderRepository extends ServiceEntityRepository
             $startOfDay = $date->setTime(0, 0);
             $endOfDay = $date->setTime(23, 59, 59);
 
-            $qb->andWhere('e.created_at BETWEEN :startOfDay AND :endOfDay')
+            $qb->andWhere('o.date BETWEEN :startOfDay AND :endOfDay')
                 ->setParameter('startOfDay', $startOfDay)
                 ->setParameter('endOfDay', $endOfDay);
         }
@@ -56,28 +56,51 @@ class OrderRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-//    /**
-//     * @return Order[] Returns an array of Order objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('o.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //chercher les moyennes des ventes sur une année
+    public function getAverageSalesForYear()
+    {
+        $currentYear = date('Y');
+        $currentMonth = date('m');
+        $monthsElapsed = $currentMonth;
 
-//    public function findOneBySomeField($value): ?Order
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        // Chiffre d'affaires total
+        $qbTotalSales = $this->createQueryBuilder('o')
+            ->select('SUM(o.price) as totalSales')
+            ->where('SUBSTRING(o.date, 1, 4) = :currentYear')
+            ->setParameter('currentYear', $currentYear);
+
+        $totalSalesResult = $qbTotalSales->getQuery()->getSingleScalarResult();
+
+        // Année bisextille?
+        $daysInYear = (date('L') == 1) ? 366 : 365;
+
+        // Moyenne des ventes par jour
+        $averageSalesPerDay = $totalSalesResult / $daysInYear;
+
+        // Ventes par mois
+        $qbMonthly = $this->createQueryBuilder('o')
+            ->select('SUBSTRING(o.date, 6, 2) as month', 'SUM(o.price) as averageSales')
+            ->where('SUBSTRING(o.date, 1, 4) = :currentYear')
+            ->setParameter('currentYear', $currentYear)
+            ->groupBy('month');
+
+        $monthly = $qbMonthly->getQuery()->getArrayResult();
+
+        $averageSalesPerMonth = array_sum(array_column($monthly, 'averageSales')) / count($monthly);
+
+
+        // Construire le tableau de données de vente
+        $salesData = [
+            'salesPerDay' => $averageSalesPerDay,
+            'averageSalesPerMonth' => $averageSalesPerMonth,
+            'salesPerMonth' => [],
+            'totalSales' => $totalSalesResult
+        ];
+
+        foreach ($monthly as $monthData) {
+            $salesData['salesPerMonth'][$monthData['month']] = $monthData['averageSales'];
+        }
+
+        return $salesData;
+    }
 }

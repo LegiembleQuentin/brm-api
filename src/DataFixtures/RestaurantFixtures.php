@@ -15,7 +15,7 @@ class RestaurantFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $restaurant = new Restaurant();
             $restaurant->setName($faker->city());
             $restaurant->setAdress($faker->streetAddress());
@@ -24,19 +24,28 @@ class RestaurantFixtures extends Fixture
             $restaurant->setCountry($faker->country());
             $restaurant->setEmail($faker->companyEmail());
             $restaurant->setPhone($faker->phoneNumber());
-            $restaurant->setOperatingHours($faker->time($format = 'H:i') . '-' . $faker->time($format = 'H:i'));
-            $restaurant->setRating($faker->randomFloat(2, 0, 5));
-            $restaurant->setOpenDate($faker->dateTimeThisDecade());
 
+            $openingHour = $faker->numberBetween(9, 12);
+            $closingHour = $faker->numberBetween(14, 22);
+
+            $openingTime = sprintf('%02d:00', $openingHour);
+            $closingTime = sprintf('%02d:00', $closingHour);
+
+            $restaurant->setOperatingHours($openingTime . '-' . $closingTime);
+
+            $restaurant->setRating($faker->randomFloat(2, 0, 5));
+            $startDate = $faker->dateTimeBetween('-10 years', 'now');
+            $restaurant->setOpenDate($startDate);
             if ($faker->boolean(10)) {
-                $restaurant->setCloseDate($faker->dateTimeBetween($restaurant->getOpenDate()));
+                $endDate = $faker->dateTimeBetween($startDate, 'now');
+                $restaurant->setCloseDate($endDate);
             }
 
             $restaurant->setCreatedAt(new \DateTimeImmutable());
             $restaurant->setEnabled($faker->boolean(90));
-          
+
             $manager->persist($restaurant);
-          
+
             $this->addReference('restaurant-' . $i, $restaurant);
         }
 

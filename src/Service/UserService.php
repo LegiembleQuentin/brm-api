@@ -22,11 +22,16 @@ class UserService
 
         $token = bin2hex(random_bytes(32));
         $expiry = date_create_immutable('+1');
-        $expiry = $expiry->modify('+2 day');
+        $expiry = $expiry->modify('+3 day');
 
         $user->setEmail($employee->getEmail());
         $user->setUsername($employee->getEmail());
-        $user->setRoles([$employee->getRole()]);
+
+        $role = null;
+        if ($employee->getRole = 'DIRECTOR'){$role = 'ROLE_DIRECTOR';}
+        else if ($employee->getRole = 'DIRECTOR'){$role = 'ROLE_DIRECTOR';}
+
+        $user->setRoles([$role]);
         $user->setEnabled(false);
         $user->setInvitationToken($token);
         $user->setInvitationTokenExpiry($expiry);

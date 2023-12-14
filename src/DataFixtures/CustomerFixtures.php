@@ -20,18 +20,22 @@ class CustomerFixtures extends Fixture
             $customer->setFirstname($faker->firstName);
             $customer->setLastname($faker->lastName);
             $customer->setEmail($faker->email);
-            $customer->setPhone($faker->phoneNumber);
             $customer->setAdress($faker->address);
             $customer->setCity($faker->city);
-            $customer->setPostalCode($faker->postcode);
             $customer->setCountry($faker->countryCode);
             $customer->setCreatedAt(new \DateTimeImmutable());
-            $customer->setLastCommand($faker->dateTimeThisCentury());
+            $customer->setLastCommand($faker->dateTimeBetween('-1 year', 'now'));
             $customer->setFidelityPoints($faker->numberBetween(1, 100));
+            $customer->setPostalCode($faker->postcode);
+            $postalCodeWithoutSpaces = str_replace(' ', '', $customer->getPostalCode());
+            $customer->setPostalCode($postalCodeWithoutSpaces);
 
+            $internationalPhone = $faker->phoneNumber;
+            $numericPhone = preg_replace('/[^0-9]/', '', $internationalPhone);
+            $formattedPhone = substr($numericPhone, 0, 10);
+            $customer->setPhone($formattedPhone);
 
             $manager->persist($customer);
-
 
             $this->addReference('customer-' . $i, $customer);
         }

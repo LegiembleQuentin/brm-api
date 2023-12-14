@@ -105,6 +105,20 @@ class Order
         return $this->orderProducts;
     }
 
+    /**
+     * @return float
+     */
+    public function getTotalPrice(): float
+    {
+        $totalPrice = 0.0;
+
+        foreach ($this->getOrderProducts() as $orderProduct) {
+            $totalPrice += $orderProduct->getProduct()->getPrice() * $orderProduct->getQuantity();
+        }
+
+        return $totalPrice;
+    }
+
     public function addOrderProduct(OrderProduct $orderProduct): static
     {
         if (!$this->orderProducts->contains($orderProduct)) {
