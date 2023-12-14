@@ -14,7 +14,7 @@ class UserRestaurantFixtures extends Fixture implements DependentFixtureInterfac
         for ($i = 0; $i < 14; $i++) {
             $userRestaurant = new UserRestaurant();
 
-            $restaurantReference = 'restaurant-' . rand(0, 14);
+            $restaurantReference = 'restaurant-' . rand(0, 4);
             $restaurant = $this->getReference($restaurantReference);
             $userRestaurant->setRestaurant($restaurant);
 

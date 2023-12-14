@@ -26,7 +26,12 @@ class UserService
 
         $user->setEmail($employee->getEmail());
         $user->setUsername($employee->getEmail());
-        $user->setRoles([$employee->getRole()]);
+
+        $role = null;
+        if ($employee->getRole = 'DIRECTOR'){$role = 'ROLE_DIRECTOR';}
+        else if ($employee->getRole = 'DIRECTOR'){$role = 'ROLE_DIRECTOR';}
+
+        $user->setRoles([$role]);
         $user->setEnabled(false);
         $user->setInvitationToken($token);
         $user->setInvitationTokenExpiry($expiry);

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Absences;
 use App\Filter\AbsenceFilter;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -60,6 +61,43 @@ class AbsencesRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function getAbsenceRatesByRestaurant()
+    {
+        $currentYear = date('Y');
+        $startDate = $currentYear . '-01-01';
+        $endDate = date('Y-m-d');
+
+        $daysElapsed = (new DateTime($endDate))->diff(new DateTime($startDate))->days + 1;
+
+        $qb = $this->createQueryBuilder('a')
+            ->select(
+                'r.name as restaurant',
+                'SUM(CASE WHEN a.approved = 1 THEN 1 ELSE 0 END) / :daysElapsed as dailyApprovedAbsences',
+                'SUM(CASE WHEN a.approved = 0 THEN 1 ELSE 0 END) / :daysElapsed as dailyUnapprovedAbsences'
+            )
+            ->join('a.employee', 'e')
+            ->join('e.restaurant', 'r')
+            ->where('a.start_date BETWEEN :startDate AND :endDate')
+            ->groupBy('r.id')
+            ->setParameters([
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'daysElapsed' => $daysElapsed
+            ]);
+
+        $absencesStats = $qb->getQuery()->getArrayResult();
+
+        return array_map(function ($stat) {
+            return [
+                'restaurant' => $stat['restaurant'],
+                'dailyApprovedAbsences' => $stat['dailyApprovedAbsences'],
+                'dailyUnapprovedAbsences' => $stat['dailyUnapprovedAbsences']
+            ];
+        }, $absencesStats);
+    }
+
+
 
 //    /**
 //     * @return Absences[] Returns an array of Absences objects

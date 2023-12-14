@@ -20,7 +20,7 @@ class UserFixtures extends Fixture
             $user->setUsername($faker->userName);
             $user->setEmail($faker->email);
             $user->setPassword($faker->md5());
-            $user->setRoles((['Manager', 'Responsable Marketing', 'Directeur', 'Administrateur']));
+            $user->setRoles((['ROLE_DIRECTOR', 'ROLE_ADMIN']));
             $user->setEnabled($faker->randomElement([true, false]));
             $user->setInvitationToken($faker->md5());
             $user->setInvitationTokenExpiry($faker->dateTimeThisDecade());
