@@ -3,10 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Customer;
-use App\Entity\Restaurant;
 use App\Filter\CustomerFilter;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
