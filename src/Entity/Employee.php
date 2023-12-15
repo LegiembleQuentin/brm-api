@@ -78,7 +78,7 @@ class Employee
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Assert\Length(
-        max: 5,
+        max: 6,
     )]
     #[Serializer\Groups(['employee'])]
     private ?string $postal_code = null;

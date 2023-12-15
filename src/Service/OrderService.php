@@ -4,7 +4,6 @@ use App\Entity\Order;
 use App\Filter\OrderFilter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use JMS\Serializer\Annotation as Serializer;
 
 class OrderService
 {

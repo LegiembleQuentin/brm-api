@@ -3,9 +3,7 @@
 namespace App\Controller;
 
 use App\Filter\OrderFilter;
-use App\Filter\StockFilter;
 use App\Service\OrderService;
-use App\Service\StockService;
 use DateTimeImmutable;
 use Exception;
 use JMS\Serializer\DeserializationContext;

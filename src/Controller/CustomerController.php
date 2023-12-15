@@ -7,7 +7,6 @@ use App\Filter\CustomerFilter;
 use App\Service\CustomerService;
 use Exception;
 use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

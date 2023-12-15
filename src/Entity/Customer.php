@@ -17,7 +17,6 @@ class Customer
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Serializer\Groups(["default", "customer"])]
-
     private ?int $id = null;
 
 
@@ -75,8 +74,8 @@ class Customer
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Assert\Length(
-        min: 5,
-        max: 5,
+        min: 4,
+        max: 6,
     )]
     #[Serializer\Groups(['customer'])]
     private ?string $postal_code = null;
